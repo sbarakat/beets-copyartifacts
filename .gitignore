@@ -1,0 +1,4 @@
+*.pyc
+dist/*
+build/*
+copyartifacts.egg-info/*
