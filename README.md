@@ -1,10 +1,14 @@
 # copyartifacts plugin for beets
 
-This is a simple plugin that copies all files, that don't get imported by beets, into the library directory.
+A plugin that moves non-music files during the import process.
+
+This is a plugin for [beets](http://beets.radbox.org/): a music library manager and much more.
+
+## Warning
+
+This code is very experimental - USE AT YOUR OWN RISK!
 
 ## Installing
-
-**Warning**: This code is very experimental - USE AT YOUR OWN RISK!
 
 Installation of the plugin can be done using these commands:
 
@@ -18,8 +22,26 @@ You will then need to enable the plugin in beets' config.yaml
 
     plugins: copyartifacts
 
+## Configuration
+
+It can copy files by file extenstion:
+
+    copyartifacts:
+        extensions: .cue .log
+
+Or copy all non-music files (it does this by default):
+
+    copyartifacts:
+        extensions: .*
+
+It can also print what got left:
+
+    copyartifacts:
+        print_ignored: yes
+
 ## License
 
 Copyright (c) 2014 Sami Barakat
+
 Licensed under the [MIT license](https://github.com/sbarakat/beets-copyartifacts/blob/master/MIT-LICENSE.txt).
 
