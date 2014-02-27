@@ -1,6 +1,7 @@
 import os
 
 import beets.util
+from beets import config
 from beets.plugins import BeetsPlugin
 
 class CopyArtifactsPlugin(BeetsPlugin):
@@ -18,12 +19,8 @@ class CopyArtifactsPlugin(BeetsPlugin):
         self.register_listener('import_task_files', self.add_artifacts)
 
     def add_artifacts(self, task, session):
-        # Get the import move and copy config options to determine if files should be copied or moved
-        move = beets.config['import']['move'].get()
-        copy = beets.config['import']['copy'].get()
-
         # Don't do anything if not moving or copying
-        if not (move or copy):
+        if not (config['import']['move'] or config['import']['copy']):
             return None
         
         # Get the destintation path by taking the first unique path of the files aready imported 
@@ -58,7 +55,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         # Copy or move (depending on config option) any source files to destination path
         if source_files:
-            if move:
+            if config['import']['move']:
                 print 'Moving artifacts:'
             else:
                 print 'Copying artifacts:'
@@ -69,7 +66,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
                 print '   ', os.path.basename(dest_file)
                 
-                if move:
+                if config['import']['move']:
                     beets.util.move(source_file, dest_file)
                 else:
                     beets.util.copy(source_file, dest_file)
