@@ -1,6 +1,7 @@
 import os
 
 import beets.util
+from beets import config
 from beets.plugins import BeetsPlugin
 
 class CopyArtifactsPlugin(BeetsPlugin):
@@ -38,13 +39,21 @@ class CopyArtifactsPlugin(BeetsPlugin):
                     ignored_files.append(source_file)
 
         if source_files:
-            print 'Copying artifacts:'
+            if config['import']['move']:
+                print 'Moving artifacts:'
+            elif config['import']['copy']:
+                print 'Copying artifacts:'
+                
             for source_file in source_files:
                 filename = os.path.basename(source_file)
                 dest_file = beets.util.unique_path(os.path.join(dest_path, filename))
 
                 print '   ', os.path.basename(dest_file)
-                beets.util.copy(source_file, dest_file)
+                
+                if config['import']['move']:
+                    beets.util.move(source_file, dest_file)
+                elif config['import']['copy']:
+                    beets.util.copy(source_file, dest_file)
 
         if self.print_ignored and ignored_files:
             print 'Ignored files:'
