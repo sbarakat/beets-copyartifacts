@@ -69,7 +69,14 @@ class CopyArtifactsPlugin(BeetsPlugin):
                 if config['import']['move']:
                     beets.util.move(source_file, dest_file)
                 else:
-                    beets.util.copy(source_file, dest_file)
+                    item = task.imported_items()[0]
+                    if task.replaced_items[item]:
+                        # This is a reimport
+                        # Move instead of copy since the files are already in the library directory
+                        beets.util.move(source_file, dest_file)
+                    else:
+                        # A normal import, just copy
+                        beets.util.copy(source_file, dest_file)
 
         # Print out any ignored files depending on config option
         if self.print_ignored and ignored_files:
