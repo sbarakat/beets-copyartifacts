@@ -43,6 +43,39 @@ It can also print what got left:
     copyartifacts:
         print_ignored: yes
 
+### Renaming files
+
+Renaming works in much the same way as beets [Path Formats](http://beets.readthedocs.org/en/v1.3.3/reference/pathformat.html)
+with the following limitations:
+- The only fields that are available are `$artist`, `$album` and `$albumpath`.
+- The full set of [built in functions](http://beets.readthedocs.org/en/v1.3.3/reference/pathformat.html#functions)
+  are also supported, with the exception of `%aunique` - which will return an empty string.
+
+Each template string uses a query syntax for each of the file extensions. For
+example the following template string will be applied to `.log` files:
+
+    paths:
+        ext:log: $albumpath/$artist - $album
+
+This will rename a log file to: `~/Music/Artist/2014 - Album/Artist - Album.log`
+
+### Example config
+
+```
+plugins: copyartifacts
+
+paths:
+    default: $albumartist/$year - $album/$track - $title
+    singleton: Singletons/$artist - $title
+    ext:log: $albumpath/$artist - $album
+    ext:cue: $albumpath/$artist - $album
+    ext:jpg: $albumpath/cover
+
+copyartifacts:
+    extensions: .cue .log .jpg
+    print_ignored: yes
+```
+
 ## Roadmap
 
 See [Milestones](https://github.com/sbarakat/beets-copyartifacts/issues/milestones)
