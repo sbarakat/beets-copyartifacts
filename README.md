@@ -6,7 +6,11 @@ This is a plugin for [beets](http://beets.radbox.org/): a music library manager 
 
 ## Warning
 
-This code is very experimental - USE AT YOUR OWN RISK!
+This code is very experimental. I'm learning how to use beets and its features
+as I develop this. Please report any issues you may have and feel free to
+contribute.
+
+USE AT YOUR OWN RISK!!
 
 ## Installing
 
@@ -38,6 +42,10 @@ It can also print what got left:
 
     copyartifacts:
         print_ignored: yes
+
+## Roadmap
+
+See [Milestones](https://github.com/sbarakat/beets-copyartifacts/issues/milestones)
 
 ## License
 
