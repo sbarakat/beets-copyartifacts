@@ -43,11 +43,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
                     ignored_files.append(source_file)
 
         if source_files:
-            if config['import']['move']:
-                print 'Moving artifacts:'
-            else:
-                print 'Copying artifacts:'
-                
             for source_file in source_files:
                 if dest_path == os.path.dirname(source_file):
                     continue
@@ -55,20 +50,26 @@ class CopyArtifactsPlugin(BeetsPlugin):
                 filename = os.path.basename(source_file)
                 dest_file = beets.util.unique_path(os.path.join(dest_path, filename))
 
-                print '   ', os.path.basename(dest_file)
-                
                 if config['import']['move']:
-                    beets.util.move(source_file, dest_file)
+                    self._move_artifact(source_file, dest_file)
                 else:
                     if task.replaced_items[task.imported_items()[0]]:
                         # Reimport
-                        beets.util.move(source_file, dest_file)
+                        self._move_artifact(source_file, dest_file)
                         task.prune(source_files[0]) 
                     else:
-                        beets.util.copy(source_file, dest_file)
+                        self._copy_artifact(source_file, dest_file)
 
 
         if self.print_ignored and ignored_files:
             print 'Ignored files:'
             for f in ignored_files:
                 print '   ', os.path.basename(f)
+
+    def _copy_artifact(self, source_file, dest_file):
+        print 'Copying artifact: {0}'.format(os.path.basename(dest_file))
+        beets.util.copy(source_file, dest_file)
+
+    def _move_artifact(self, source_file, dest_file):
+        print 'Moving artifact: {0}'.format(os.path.basename(dest_file))
+        beets.util.move(source_file, dest_file)
