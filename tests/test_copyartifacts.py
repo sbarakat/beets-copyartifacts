@@ -23,9 +23,9 @@ if not os.path.isdir(beetspath):
 # Put the beets directory at the front of the search path
 sys.path.insert(0, beetspath)
 
-from test import _common
-from testsupport import ImportHelper
+from testsupport import CopyArtifactsTestCase
 from beets import plugins
+from beets import config
 
 import beetsplug
 
@@ -33,18 +33,137 @@ import beetsplug
 beetsplug.__path__.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'beetsplug')))
 plugins.load_plugins(['copyartifacts'])
 
-class CopyArtifactsTest(_common.TestCase, ImportHelper):
+class CopyArtifactsReimportTest(CopyArtifactsTestCase):
+    """
+    Tests to check that copyartifacts handles reimports correctly
+    """
     def setUp(self):
-        super(CopyArtifactsTest, self).setUp()
-
-        self._setup_library()
-        self._create_import_dir()
+        super(CopyArtifactsReimportTest, self).setUp()
+        
+        self._create_flat_import_dir()
         self._setup_import_session(autotag=False)
 
-    def test_album_created_with_track_artist(self):
+        self.plugin.extensions = ['.file']
+        
+        # Initial import
         self.importer.run()
-        self.assertEqual(1, 1)
+   
+        # Change the path formats so the files in the library are relocated when reimported
+        self.original_path_formats = list(self.lib.path_formats)
+        self.lib.path_formats[0] = ('default', os.path.join('1$artist', '$album', '$title'))
+        
+        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
+
+    def test_move_artifacts_with_copy_import(self):
+        self.importer.run()
+
+        self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
+        self.assert_in_lib_dir('1Tag Artist', 'Tag Album', 'artifact.file')
+
+    def test_prune_empty_directories_with_copy_import(self):
+        self.importer.run()
+
+        self.assert_not_in_lib_dir('Tag Artist')
+
+    def test_move_artifacts_with_move_import(self):
+        config['import']['move'] = True
+
+        self.importer.run()
+
+        self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
+        self.assert_in_lib_dir('1Tag Artist', 'Tag Album', 'artifact.file')
+    
+    def test_prune_empty_directories_with_move_import(self):
+        config['import']['move'] = True
+        
+        self.importer.run()
+        
+        self.assert_not_in_lib_dir('Tag Artist')
+
+    def test_do_nothing_when_paths_do_not_change_with_copy_import(self):
+        self.lib.path_formats = self.original_path_formats
+        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
+        
+        self.importer.run()
+        
+        self.assert_number_of_files_in_dir(2, self.lib_dir, 'Tag Artist', 'Tag Album')
+        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
+
+    def test_do_nothing_when_paths_do_not_change_with_move_import(self):
+        self.lib.path_formats = self.original_path_formats
+        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
+        config['import']['move'] = True
+        
+        self.importer.run()
+        
+        self.assert_number_of_files_in_dir(2, self.lib_dir, 'Tag Artist', 'Tag Album')
+        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
 
 
+class CopyArtifactsFromFlatDirectoryTest(CopyArtifactsTestCase):
+    """
+    Tests to check that copyartifacts copies or moves artifact files from a flat directory.
+    i.e. all songs in an album are imported from a single directory
+    """
+    def setUp(self):
+        super(CopyArtifactsFromFlatDirectoryTest, self).setUp()
+
+        self._create_flat_import_dir()
+        self._setup_import_session(autotag=False)
+    
+    def test_copy_all_artifacts_by_default(self):
+        self.importer.run()
+        
+        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
+        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
+
+    def test_ignore_media_files(self):
+        self.importer.run()
+
+        self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'track_1.mp3')
+    
+    def test_only_copy_artifacts_matching_configured_extension(self):
+        self.plugin.extensions = ['.file']
+
+        self.importer.run()
+        
+        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
+        self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
+
+    def test_move_artifacts(self):
+        config['import']['move'] = True
+        
+        self.importer.run()
+        
+        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
+        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
+        self.assert_not_in_import_dir('the_album', 'artifact.file')
+        self.assert_not_in_import_dir('the_album', 'artifact.file2')
+
+    def test_prune_import_directory_when_emptied(self):
+        """
+        Check that plugin does not interfere with normal
+        pruning of emptied import directories.
+        """
+        config['import']['move'] = True
+
+        self.importer.run()
+        
+        self.assert_not_in_import_dir('the_album')
+
+    def test_do_nothing_when_not_copying_or_moving(self):
+        """
+        Check that plugin leaves everthing alone when not
+        copying (-C command line option) and not moving.
+        """
+        config['import']['copy'] = False
+        config['import']['move'] = False
+        
+        self.importer.run()
+      
+        self.assert_number_of_files_in_dir(3, self.import_dir, 'the_album')
+        self.assert_in_import_dir('the_album', 'artifact.file')
+        self.assert_in_import_dir('the_album', 'artifact.file2')
+       
 if __name__ == '__main__':
     unittest.main()
