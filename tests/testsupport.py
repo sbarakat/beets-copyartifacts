@@ -23,14 +23,17 @@ class CopyArtifactsTestCase(_common.TestCase):
         # Install the DummyIO to capture anything directed to stdout
         self.io.install()
 
-        # Get the copyartifacts plugin instance
-        self.plugin = plugins.find_plugins()[0]
+        # Create an instance of the plugin
+        plugins.find_plugins()
 
     def tearDown(self):
+        # Unregister listners
+        del plugins._classes[0].listeners['import_task_files'][0]
+
+        # Delete the plugin instance so a new one gets created for each test
+        del plugins._instances[plugins._classes[0]]
+
         super(CopyArtifactsTestCase, self).tearDown()
-        
-        # Reset config
-        self.plugin.extensions = ['.*']
 
     def _setup_library(self):
         self.lib_db = os.path.join(self.temp_dir, 'testlib.blb')
