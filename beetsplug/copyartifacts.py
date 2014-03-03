@@ -20,8 +20,11 @@ class CopyArtifactsPlugin(BeetsPlugin):
             'print_ignored': False
         })
 
+        self.extensions = self.config['extensions'].as_str_seq()
+        self.print_ignored = self.config['print_ignored'].get()
+
         self.path_formats = [c for c in beets.ui.get_path_formats() if c[0][:4] == u'ext:']
-        
+
         self.register_listener('import_task_files', self.add_artifacts)
 
     def _destination(self, filename, mapping):
@@ -56,8 +59,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
         return beets.util.unique_path(file_path)
 
     def add_artifacts(self, task, session):
-        extensions = self.config['extensions'].as_str_seq()
-
         # Get the destintation path by taking the first unique path of the files aready imported 
         # there has to be a better way of doing this
         album_path = set(os.path.dirname(i.path) for i in task.imported_items())
@@ -73,7 +74,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
         ignored_files = []
 
         for filename in os.listdir(task.paths[0]):
-
             source_file = os.path.join(task.paths[0], filename)
 
             if source_file in task.old_paths:
@@ -82,7 +82,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
             if os.path.isfile(source_file):
                 file_ext = os.path.splitext(filename)[1]
 
-                if '.*' in extensions or file_ext in extensions:
+                if '.*' in self.extensions or file_ext in self.extensions:
                     source_files.append(source_file)
                 else:
                     ignored_files.append(source_file)
@@ -106,7 +106,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
                         self._copy_artifact(source_file, dest_file)
 
 
-        if self.config['print_ignored'] and ignored_files:
+        if self.print_ignored and ignored_files:
             print 'Ignored files:'
             for f in ignored_files:
                 print '   ', os.path.basename(f)

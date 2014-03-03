@@ -11,9 +11,10 @@ from beets import plugins
 
 class CopyArtifactsTestCase(_common.TestCase):
     """
-    Provides common setup and teardown, tools to setup a library, a directory
-    containing files that are to be imported and an import session. The class
-    also provides stubs for the autotagging library and assertions helpers.
+    Provides common setup and teardown, a convenience method for exercising the 
+    plugin/importer, tools to setup a library, a directory containing files
+    that are to be imported and an import session. The class also provides stubs
+    for the autotagging library and assertions helpers.
     """
     def setUp(self):
         super(CopyArtifactsTestCase, self).setUp()
@@ -23,17 +24,29 @@ class CopyArtifactsTestCase(_common.TestCase):
         # Install the DummyIO to capture anything directed to stdout
         self.io.install()
 
+    def _run_importer(self):
+        """
+        Create an instance of the plugin, run the importer, and
+        remove/unregister the plugin instance so a new instance can
+        be created when this method is run again.
+        This is a convenience method that can be called to setup, exercise
+        and teardown the system under test after setting any config options
+        and before assertions are made regarding changes to the filesystem.
+        """
+        # Setup
         # Create an instance of the plugin
         plugins.find_plugins()
 
-    def tearDown(self):
+        # Exercise
+        # Run the importer
+        self.importer.run()
+       
+        # Teardown
         # Unregister listners
         del plugins._classes[0].listeners['import_task_files'][0]
 
         # Delete the plugin instance so a new one gets created for each test
         del plugins._instances[plugins._classes[0]]
-
-        super(CopyArtifactsTestCase, self).tearDown()
 
     def _setup_library(self):
         self.lib_db = os.path.join(self.temp_dir, 'testlib.blb')
@@ -159,6 +172,6 @@ class CopyArtifactsTestCase(_common.TestCase):
 
     def assert_number_of_files_in_dir(self, count, *segments):
         """
-        Assert that there are ``count`` files in ``path``
+        Assert that there are ``count`` files in path formed by joining ``segments``
         """
         self.assertEqual(len([name for name in os.listdir(os.path.join(*segments))]), count)
