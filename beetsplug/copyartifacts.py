@@ -59,14 +59,12 @@ class CopyArtifactsPlugin(BeetsPlugin):
         return beets.util.unique_path(file_path)
 
     def add_artifacts(self, task, session):
-        # Get the destintation path by taking the first unique path of the files aready imported 
-        # there has to be a better way of doing this
-        album_path = set(os.path.dirname(i.path) for i in task.imported_items())
-        album_path = list(album_path)[0]
+        imported_item = task.imported_items()[0]
+        album_path = os.path.dirname(imported_item.path)
 
         mapping = {
-            'artist': task.cur_album,
-            'album': task.cur_artist,
+            'artist': imported_item.artist or 'None',
+            'album': imported_item.album or 'None',
             'albumpath': album_path
         }
 
@@ -98,7 +96,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
                 if config['import']['move']:
                     self._move_artifact(source_file, dest_file)
                 else:
-                    if task.replaced_items[task.imported_items()[0]]:
+                    if task.replaced_items[imported_item]:
                         # Reimport
                         self._move_artifact(source_file, dest_file)
                         task.prune(source_files[0]) 
