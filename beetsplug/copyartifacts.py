@@ -71,15 +71,15 @@ class CopyArtifactsPlugin(BeetsPlugin):
         source_files = []
         ignored_files = []
 
-        for filename in os.listdir(task.paths[0]):
-            source_file = os.path.join(task.paths[0], filename)
+        for root, dirs, files in beets.util.sorted_walk(
+                    task.paths[0], ignore=config['ignore'].as_str_seq()):
+            for filename in files:
+                source_file = os.path.join(root, filename)
 
-            if source_file in task.old_paths:
-                continue
+                if source_file in task.old_paths:
+                    continue
 
-            if os.path.isfile(source_file):
                 file_ext = os.path.splitext(filename)[1]
-
                 if '.*' in self.extensions or file_ext in self.extensions:
                     source_files.append(source_file)
                 else:
@@ -99,10 +99,9 @@ class CopyArtifactsPlugin(BeetsPlugin):
                     if task.replaced_items[imported_item]:
                         # Reimport
                         self._move_artifact(source_file, dest_file)
-                        task.prune(source_files[0]) 
+                        task.prune(source_files[0])
                     else:
                         self._copy_artifact(source_file, dest_file)
-
 
         if self.print_ignored and ignored_files:
             print 'Ignored files:'
@@ -116,3 +115,4 @@ class CopyArtifactsPlugin(BeetsPlugin):
     def _move_artifact(self, source_file, dest_file):
         print 'Moving artifact: {0}'.format(os.path.basename(dest_file))
         beets.util.move(source_file, dest_file)
+
