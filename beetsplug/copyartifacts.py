@@ -2,6 +2,7 @@ import os
 import sys
 
 import beets.util
+from beets import config
 from beets.ui import get_path_formats
 from beets.plugins import BeetsPlugin
 from beets.library import DefaultTemplateFunctions
@@ -16,10 +17,10 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         self.config.add({
             'extensions': '.*',
-            'print_ignored': 'no'
+            'print_ignored': False
         })
 
-        self.extensions = self.config['extensions'].get().split()
+        self.extensions = self.config['extensions'].as_str_seq()
         self.print_ignored = self.config['print_ignored'].get()
 
         self.path_formats = [c for c in beets.ui.get_path_formats() if c[0][:4] == u'ext:']
@@ -58,20 +59,21 @@ class CopyArtifactsPlugin(BeetsPlugin):
         return beets.util.unique_path(file_path)
 
     def add_artifacts(self, task, session):
-        # there has to be a better way of doing this
-        album_path = set(os.path.dirname(i.path) for i in task.imported_items())
-        album_path = list(album_path)[0]
+        imported_item = task.imported_items()[0]
+        album_path = os.path.dirname(imported_item.path)
 
         mapping = {
-            'artist': task.cur_album,
-            'album': task.cur_artist,
+            'artist': imported_item.artist or 'None',
+            'album': imported_item.album or 'None',
             'albumpath': album_path
         }
 
         source_files = []
         ignored_files = []
+
         for filename in os.listdir(task.paths[0]):
             source_file = os.path.join(task.paths[0], filename)
+
             if source_file in task.old_paths:
                 continue
 
@@ -84,16 +86,33 @@ class CopyArtifactsPlugin(BeetsPlugin):
                     ignored_files.append(source_file)
 
         if source_files:
-            print 'Copying artifacts:'
             for source_file in source_files:
+                if album_path == os.path.dirname(source_file):
+                    continue
+
                 filename = os.path.basename(source_file)
                 dest_file = self._destination(filename, mapping)
 
-                print '   ', os.path.basename(dest_file)
-                beets.util.copy(source_file, dest_file)
+                if config['import']['move']:
+                    self._move_artifact(source_file, dest_file)
+                else:
+                    if task.replaced_items[imported_item]:
+                        # Reimport
+                        self._move_artifact(source_file, dest_file)
+                        task.prune(source_files[0]) 
+                    else:
+                        self._copy_artifact(source_file, dest_file)
+
 
         if self.print_ignored and ignored_files:
             print 'Ignored files:'
             for f in ignored_files:
                 print '   ', os.path.basename(f)
 
+    def _copy_artifact(self, source_file, dest_file):
+        print 'Copying artifact: {0}'.format(os.path.basename(dest_file))
+        beets.util.copy(source_file, dest_file)
+
+    def _move_artifact(self, source_file, dest_file):
+        print 'Moving artifact: {0}'.format(os.path.basename(dest_file))
+        beets.util.move(source_file, dest_file)
