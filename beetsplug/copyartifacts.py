@@ -4,6 +4,7 @@ import sys
 import beets.util
 from beets import config
 from beets.ui import get_path_formats
+from beets.mediafile import TYPES
 from beets.plugins import BeetsPlugin
 from beets.library import DefaultTemplateFunctions
 from beets.util.functemplate import Template
@@ -86,6 +87,9 @@ class CopyArtifactsPlugin(BeetsPlugin):
                     continue
 
                 file_ext = os.path.splitext(filename)[1]
+                if len(file_ext) > 1 and file_ext[1:] in TYPES:
+                    continue
+
                 if '.*' in self.extensions or file_ext in self.extensions:
                     source_files.append(source_file)
                 else:
