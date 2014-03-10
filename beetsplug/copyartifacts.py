@@ -71,8 +71,14 @@ class CopyArtifactsPlugin(BeetsPlugin):
         source_files = []
         ignored_files = []
 
+        source_path = ''
+        try:
+            source_path = task.paths[0]
+        except TypeError:
+            source_path = os.path.dirname(task.old_paths[0])
+
         for root, dirs, files in beets.util.sorted_walk(
-                    task.paths[0], ignore=config['ignore'].as_str_seq()):
+                    source_path, ignore=config['ignore'].as_str_seq()):
             for filename in files:
                 source_file = os.path.join(root, filename)
 
