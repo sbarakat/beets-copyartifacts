@@ -59,16 +59,30 @@ class CopyArtifactsPlugin(BeetsPlugin):
         file_path = subpath + file_ext
         return beets.util.unique_path(file_path)
 
+    def _format(self, value):
+        '''Replace path separators in value
+            - ripped from beets/dbcore/db.py
+        '''
+        sep_repl = beets.config['path_sep_replace'].get(unicode)
+        for sep in (os.path.sep, os.path.altsep):
+            if sep:
+                value = value.replace(sep, sep_repl)
+
+        return value
+
     def add_artifacts(self, task, session):
         imported_item = task.imported_items()[0]
         album_path = os.path.dirname(imported_item.path)
 
+        # generate mappings
         mapping = {
             'artist': imported_item.artist or u'None',
             'albumartist': imported_item.albumartist or u'None',
             'album': imported_item.album or u'None',
-            'albumpath': beets.util.displayable_path(album_path)
         }
+        for key in mapping:
+            mapping[key] = self._format(mapping[key])
+        mapping['albumpath'] = beets.util.displayable_path(album_path)
 
         source_files = []
         ignored_files = []
