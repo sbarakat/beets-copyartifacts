@@ -67,7 +67,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
             'artist': imported_item.artist or u'None',
             'albumartist': imported_item.albumartist or u'None',
             'album': imported_item.album or u'None',
-            'albumpath': album_path
+            'albumpath': beets.util.displayable_path(album_path)
         }
 
         source_files = []
