@@ -119,10 +119,12 @@ class CopyArtifactsPlugin(BeetsPlugin):
                 print '   ', os.path.basename(f)
 
     def _copy_artifact(self, source_file, dest_file):
+        dest_file = beets.util.bytestring_path(dest_file)
         print 'Copying artifact: {0}'.format(os.path.basename(dest_file))
         beets.util.copy(source_file, dest_file)
 
     def _move_artifact(self, source_file, dest_file):
+        dest_file = beets.util.bytestring_path(dest_file)
         print 'Moving artifact: {0}'.format(os.path.basename(dest_file))
         beets.util.move(source_file, dest_file)
 
