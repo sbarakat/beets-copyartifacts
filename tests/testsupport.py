@@ -43,11 +43,13 @@ class CopyArtifactsTestCase(_common.TestCase):
        
         # Teardown
         if plugins._instances:
+            classes = list(plugins._classes)
+            
             # Unregister listners
-            del plugins._classes[0].listeners['import_task_files'][0]
+            del classes[0].listeners['import_task_files'][0]
         
             # Delete the plugin instance so a new one gets created for each test
-            del plugins._instances[plugins._classes[0]]
+            del plugins._instances[classes[0]]
 
     def _setup_library(self):
         self.lib_db = os.path.join(self.temp_dir, 'testlib.blb')
