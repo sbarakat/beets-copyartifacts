@@ -47,7 +47,7 @@ It can also print what got left:
 
 Renaming works in much the same way as beets [Path Formats](http://beets.readthedocs.org/en/v1.3.3/reference/pathformat.html)
 with the following limitations:
-- The only fields that are available are `$artist`, `$album` and `$albumpath`.
+- The fields available are `$artist`, `$albumartist`, `$album` and `$albumpath`.
 - The full set of [built in functions](http://beets.readthedocs.org/en/v1.3.3/reference/pathformat.html#functions)
   are also supported, with the exception of `%aunique` - which will return an empty string.
 

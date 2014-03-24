@@ -64,8 +64,9 @@ class CopyArtifactsPlugin(BeetsPlugin):
         album_path = os.path.dirname(imported_item.path)
 
         mapping = {
-            'artist': imported_item.artist or 'None',
-            'album': imported_item.album or 'None',
+            'artist': imported_item.artist or u'None',
+            'albumartist': imported_item.albumartist or u'None',
+            'album': imported_item.album or u'None',
             'albumpath': album_path
         }
 
