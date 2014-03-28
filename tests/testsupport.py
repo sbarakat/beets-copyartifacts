@@ -77,14 +77,39 @@ class CopyArtifactsTestCase(_common.TestCase):
             artifact.file
             artifact.file2
         """
-        self.import_dir = os.path.join(self.temp_dir, 'testsrcdir')
-        if os.path.isdir(self.import_dir):
-            shutil.rmtree(self.import_dir)
+        self._set_import_dir()
 
         album_path = os.path.join(self.import_dir, 'the_album')
         os.makedirs(album_path)
 
-        resource_path = os.path.join(_common.RSRC, 'full.mp3')
+        # Create artifact
+        open(os.path.join(album_path, 'artifact.file'), 'a').close()
+        open(os.path.join(album_path, 'artifact.file2'), 'a').close()
+        
+        medium = self._create_medium(os.path.join(album_path, 'track_1.mp3'), 'full.mp3')
+        self.import_media = [medium]
+
+    def _create_import_dir_with_unicode_character_in_artifact_name(self):
+        """
+        Create a flat import directory containing an artifact with file name
+        containing unicode character.
+        """
+        self._set_import_dir()
+        album_path = os.path.join(self.import_dir, 'the_album')
+        os.makedirs(album_path)
+
+        open(os.path.join(album_path, u'\xe4rtifact.file'), 'a').close()
+        
+        medium = self._create_medium(os.path.join(album_path, 'track_1.mp3'), 'full.mp3')
+        self.import_media = [medium]
+    
+    def _create_medium(self, path, resource_name):
+        """
+        Creates and saves a media file object located at path using resource_name
+        from the beets test resources directory as initial data
+        """
+
+        resource_path = os.path.join(_common.RSRC, resource_name)
 
         metadata = {
                      'artist': 'Tag Artist',
@@ -96,21 +121,23 @@ class CopyArtifactsTestCase(_common.TestCase):
                    }
 
         # Copy media file
-        medium_path = os.path.join(album_path, 'track_1.mp3')
-        shutil.copy(resource_path, medium_path)
-        medium = mediafile.MediaFile(medium_path)
+        shutil.copy(resource_path, path)
+        medium = mediafile.MediaFile(path)
 
         # Set metadata
         metadata['track'] = 1
         metadata['title'] = 'Tag Title 1'
         for attr in metadata: setattr(medium, attr, metadata[attr])
         medium.save()
+        return medium
 
-        # Create artifact
-        open(os.path.join(album_path, 'artifact.file'), 'a').close()
-        open(os.path.join(album_path, 'artifact.file2'), 'a').close()
-        
-        self.import_media = [medium]
+    def _set_import_dir(self):
+        """
+        Sets the import_dir and ensures that it is empty.
+        """
+        self.import_dir = os.path.join(self.temp_dir, 'testsrcdir')
+        if os.path.isdir(self.import_dir):
+            shutil.rmtree(self.import_dir)
 
     def _create_nested_import_dir(self):
         """
