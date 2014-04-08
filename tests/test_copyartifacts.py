@@ -124,7 +124,8 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
 class CopyArtifactsFromNestedDirectoryTest(CopyArtifactsTestCase):
     """
     Tests to check that copyartifacts copies or moves artifact files from a nested directory
-    structure. i.e. songs in an album are imported from two directories corresponding to disc numbers
+    structure. i.e. songs in an album are imported from two directories corresponding to
+    disc numbers or flat option is used
     """
 
 class CopyArtifactsFromFlatDirectoryTest(CopyArtifactsTestCase):
@@ -245,5 +246,28 @@ class CopyArtifactsPrintIgnoredTest(CopyArtifactsTestCase):
         self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
         self.assertTrue('Ignored files' in self.io.getoutput())
 
+class CopyArtifactsUnicodeFilename(CopyArtifactsTestCase):
+    """
+    Tests to check handling of artifacts with filenames containing unicode characters
+    """
+    def setUp(self):
+        super(CopyArtifactsUnicodeFilename, self).setUp()
+        
+        self._create_import_dir_with_unicode_character_in_artifact_name()
+        self._setup_import_session(autotag=False)
+        
+        config['copyartifacts']['extensions'] = '.file'
+
+    def test_copy(self):
+        self._run_importer()
+        
+        self.assert_in_lib_dir('Tag Artist', 'Tag Album', u'\xe4rtifact.file')
+
+    def test_move(self):
+        config['import']['move'] = True
+        self._run_importer()
+        
+        self.assert_in_lib_dir('Tag Artist', 'Tag Album', u'\xe4rtifact.file')
+        
 if __name__ == '__main__':
     unittest.main()
