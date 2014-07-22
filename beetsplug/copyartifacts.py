@@ -115,8 +115,9 @@ class CopyArtifactsPlugin(BeetsPlugin):
                 if album_path == os.path.dirname(source_file):
                     continue
 
-                filename = os.path.basename(source_file)
+                filename = source_file[len(source_path)+1:]
                 dest_file = self._destination(filename, mapping)
+                beets.util.mkdirall(dest_file)
 
                 if config['import']['move']:
                     self._move_artifact(source_file, dest_file)
