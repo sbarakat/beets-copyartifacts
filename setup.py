@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "copyartifacts",
-    version = "1.0-beta.1",
+    version = "1.0-beta.2",
     description="beets plugin to copy non-music files to import path",
     author='Sami Barakat',
     author_email='sami@sbarakat.co.uk',
