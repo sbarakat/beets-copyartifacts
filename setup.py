@@ -12,5 +12,5 @@ setup(
 
     packages=['beetsplug'],
     namespace_packages=['beetsplug'],
-    install_requires = ['beets>=1.3.2']
+    install_requires = ['beets>=1.3.7']
 )
