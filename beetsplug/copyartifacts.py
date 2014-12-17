@@ -148,6 +148,10 @@ class CopyArtifactsPlugin(BeetsPlugin):
         beets.util.copy(source_file, dest_file)
 
     def _move_artifact(self, source_file, dest_file):
+        if not os.path.exists(source_file):
+            # Sanity check for other plugins moving files
+            return
+
         dest_file = beets.util.bytestring_path(dest_file)
         print 'Moving artifact: {0}'.format(os.path.basename(dest_file))
         beets.util.move(source_file, dest_file)
