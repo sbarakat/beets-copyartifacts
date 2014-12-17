@@ -1,5 +1,6 @@
 import os
 import sys
+import filecmp
 
 import beets.util
 from beets import config
@@ -44,8 +45,9 @@ class CopyArtifactsPlugin(BeetsPlugin):
                 break
         else:
             # No query matched; use original filename
-            file_path = os.path.join(mapping['albumpath'], beets.util.displayable_path(filename))
-            return beets.util.unique_path(file_path)
+            file_path = os.path.join(mapping['albumpath'],
+                                     beets.util.displayable_path(filename))
+            return file_path
 
         if isinstance(path_format, Template):
             subpath_tmpl = path_format
@@ -54,10 +56,8 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         # Get template funcs and evaluate against mapping
         funcs = DefaultTemplateFunctions().functions()
-        subpath = subpath_tmpl.substitute(mapping, funcs)
-
-        file_path = subpath + file_ext
-        return beets.util.unique_path(file_path)
+        file_path = subpath_tmpl.substitute(mapping, funcs) + file_ext
+        return file_path
 
     def _format(self, value):
         '''Replace path separators in value
@@ -117,6 +117,14 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
                 filename = source_file[len(source_path)+1:]
                 dest_file = self._destination(filename, mapping)
+
+                if (os.path.exists(dest_file)
+                    and filecmp.cmp(source_file, dest_file)):
+                    # Skip file as it already exists in dest
+                    ignored_files.append(source_file)
+                    continue
+
+                dest_file = beets.util.unique_path(dest_file)
                 beets.util.mkdirall(dest_file)
 
                 if config['import']['move']:
