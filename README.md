@@ -4,14 +4,6 @@ A plugin that moves non-music files during the import process.
 
 This is a plugin for [beets](http://beets.radbox.org/): a music library manager and much more.
 
-## Warning
-
-This code is very experimental. I'm learning how to use beets and its features
-as I develop this. Please report any issues you may have and feel free to
-contribute.
-
-USE AT YOUR OWN RISK!!
-
 ## Installing
 
 Installation of the plugin can be done using these commands:
@@ -76,13 +68,21 @@ copyartifacts:
     print_ignored: yes
 ```
 
-## Roadmap
+## Thanks
 
-See [Milestones](https://github.com/sbarakat/beets-copyartifacts/issues/milestones)
+copyartifacts was built ontop of the hard work already done by Adrian Sampson and
+the larger community on [beets](http://beets.radbox.org/).
+We have also benefited from the work of our
+[contributors](https://github.com/sbarakat/beets-copyartifacts/graphs/contributors).
+
+This plugin was built out of nessesity and to scratch an itch. It has gained a
+bit of attention, so I intend to maintain it where I can, however I doubt I
+will be able to spend large amount of time on it. Please report any issues you
+may have and feel free to contribute.
 
 ## License
 
-Copyright (c) 2014 Sami Barakat
+Copyright (c) 2015 Sami Barakat
 
 Licensed under the [MIT license](https://github.com/sbarakat/beets-copyartifacts/blob/master/MIT-LICENSE.txt).
 
