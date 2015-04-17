@@ -6,7 +6,11 @@ This is a plugin for [beets](http://beets.radbox.org/): a music library manager 
 
 ## Installing
 
-Installation of the plugin can be done using these commands:
+Installation of the plugin can be done using pip:
+
+    pip install beets-copyartifacts
+
+or by using these commands:
 
     git clone https://github.com/sbarakat/beets-copyartifacts.git
     cd beets-copyartifacts
@@ -70,12 +74,12 @@ copyartifacts:
 
 ## Thanks
 
-copyartifacts was built ontop of the hard work already done by Adrian Sampson and
-the larger community on [beets](http://beets.radbox.org/).
+copyartifacts was built on top of the hard work already done by Adrian Sampson
+and the larger community on [beets](http://beets.radbox.org/).
 We have also benefited from the work of our
 [contributors](https://github.com/sbarakat/beets-copyartifacts/graphs/contributors).
 
-This plugin was built out of nessesity and to scratch an itch. It has gained a
+This plugin was built out of necessity and to scratch an itch. It has gained a
 bit of attention, so I intend to maintain it where I can, however I doubt I
 will be able to spend large amount of time on it. Please report any issues you
 may have and feel free to contribute.
