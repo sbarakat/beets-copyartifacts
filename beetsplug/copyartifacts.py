@@ -10,7 +10,7 @@ from beets.plugins import BeetsPlugin
 from beets.library import DefaultTemplateFunctions
 from beets.util.functemplate import Template
 
-__version__ = '1.0-beta.2'
+__version__ = '0.1.1'
 __author__ = 'Sami Barakat <sami@sbarakat.co.uk>'
 
 class CopyArtifactsPlugin(BeetsPlugin):

@@ -1,4 +1,5 @@
 *.pyc
+*.swp
 dist/*
 build/*
-copyartifacts.egg-info/*
+beets_copyartifacts.egg-info/*
