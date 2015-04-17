@@ -6,8 +6,6 @@ try:
 except(IOError, ImportError):
     long_description = open('README.md').read()
 
-print long_description
-
 setup(
     name = "beets-copyartifacts",
     version = "0.1.1",
