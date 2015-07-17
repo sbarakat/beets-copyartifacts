@@ -27,7 +27,8 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         self.path_formats = [c for c in beets.ui.get_path_formats() if c[0][:4] == u'ext:']
 
-        self.register_listener('import_task_files', self.add_artifacts)
+        self.register_listener('import_task_files', self.import_event)
+        #XXX: self.register_listener('item_moved', self.move_event)
 
     def _destination(self, filename, mapping):
         '''Returns a destination path a file should be moved to. The filename
@@ -70,11 +71,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         return value
 
-    def add_artifacts(self, task, session):
-        imported_item = task.imported_items()[0]
-        album_path = os.path.dirname(imported_item.path)
-
-        # generate mappings
+    def _generate_mapping(self, imported_item, album_path):
         mapping = {
             'artist': imported_item.artist or u'None',
             'albumartist': imported_item.albumartist or u'None',
@@ -83,9 +80,15 @@ class CopyArtifactsPlugin(BeetsPlugin):
         for key in mapping:
             mapping[key] = self._format(mapping[key])
         mapping['albumpath'] = beets.util.displayable_path(album_path)
+        return mapping
+
+    def import_event(self, task, session):
+        imported_item = task.imported_items()[0]
+        album_path = os.path.dirname(imported_item.path)
 
         source_files = []
         ignored_files = []
+        reimport = False
 
         source_path = ''
         try:
@@ -98,9 +101,15 @@ class CopyArtifactsPlugin(BeetsPlugin):
             for filename in files:
                 source_file = os.path.join(root, filename)
 
+                # Skip music files (already imported)
                 if source_file in task.old_paths:
                     continue
 
+                # Skip file, usually reimports to same dir
+                if album_path == os.path.dirname(source_file):
+                    continue
+
+                # Skip any files extensions handled by beets
                 file_ext = os.path.splitext(filename)[1]
                 if len(file_ext) > 1 and file_ext[1:] in TYPES:
                     continue
@@ -110,13 +119,48 @@ class CopyArtifactsPlugin(BeetsPlugin):
                 else:
                     ignored_files.append(source_file)
 
+        mapping = self._generate_mapping(imported_item, album_path)
+        if task.replaced_items[imported_item]:
+            # these will be reimports when dir has changed
+            reimport = True
+
+        self.process_artifacts(source_path, source_files, ignored_files, reimport, mapping)
+
+    def move_event(self, item, source, destination):
+        print '-------------------------------------'
+        source_path = os.path.dirname(source)
+
+        source_files = []
+        ignored_files = []
+
+        for root, dirs, files in beets.util.sorted_walk(
+                    source_path, ignore=config['ignore'].as_str_seq()):
+            for filename in files:
+                source_file = os.path.join(root, filename)
+
+                file_ext = os.path.splitext(filename)[1]
+                if len(file_ext) > 1 and file_ext[1:] in TYPES:
+                    continue
+                #print filename
+
+                if '.*' in self.extensions or file_ext in self.extensions:
+                    source_files.append(source_file)
+                else:
+                    ignored_files.append(source_file)
+
+        print source_files
+        print ignored_files
+
+    def process_artifacts(self, source_path, source_files, ignored_files, reimport=False, mapping=None):
+
         if source_files:
             for source_file in source_files:
-                if album_path == os.path.dirname(source_file):
-                    continue
 
                 filename = source_file[len(source_path)+1:]
-                dest_file = self._destination(filename, mapping)
+                if mapping:
+                    dest_file = self._destination(filename, mapping)
+                else:
+                    pass #XXX: set dest_file
 
                 if (os.path.exists(dest_file)
                     and filecmp.cmp(source_file, dest_file)):
@@ -130,12 +174,15 @@ class CopyArtifactsPlugin(BeetsPlugin):
                 if config['import']['move']:
                     self._move_artifact(source_file, dest_file)
                 else:
-                    if task.replaced_items[imported_item]:
-                        # Reimport
+                    if reimport:
+                        # This is a reimport
+                        # files are already in the library directory
                         self._move_artifact(source_file, dest_file)
-                        task.prune(source_files[0])
+                        #TODO: add prune empty source dirs
                     else:
+                        # A normal import, just copy
                         self._copy_artifact(source_file, dest_file)
+
 
         if self.print_ignored and ignored_files:
             print 'Ignored files:'
