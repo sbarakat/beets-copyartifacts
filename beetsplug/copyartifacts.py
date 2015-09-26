@@ -179,49 +179,48 @@ class CopyArtifactsPlugin(BeetsPlugin):
         ignored_files = []
         source_path = os.path.dirname(source_files[0])
 
-        if source_files:
-            for source_file in source_files:
-                # os.path.basename() not suitable here as files may be contained
-                # within dir of source_path
-                filename = source_file[len(source_path)+1:]
+        for source_file in source_files:
+            # os.path.basename() not suitable here as files may be contained
+            # within dir of source_path
+            filename = source_file[len(source_path)+1:]
 
-                dest_file = self._destination(filename, mapping)
+            dest_file = self._destination(filename, mapping)
 
-                # Skip as another plugin or beets has already moved this file
-                if not os.path.exists(source_file):
-                    ignored_files.append(source_file)
-                    continue
+            # Skip as another plugin or beets has already moved this file
+            if not os.path.exists(source_file):
+                ignored_files.append(source_file)
+                continue
 
-                # Skip extensions not handled by plugin
-                file_ext = os.path.splitext(filename)[1]
-                if ('.*' not in self.extensions
-                    and file_ext not in self.extensions):
-                    ignored_files.append(source_file)
-                    continue
+            # Skip extensions not handled by plugin
+            file_ext = os.path.splitext(filename)[1]
+            if ('.*' not in self.extensions
+                and file_ext not in self.extensions):
+                ignored_files.append(source_file)
+                continue
 
-                # Skip file if it already exists in dest
-                if (os.path.exists(dest_file)
-                    and filecmp.cmp(source_file, dest_file)):
-                    ignored_files.append(source_file)
-                    continue
+            # Skip file if it already exists in dest
+            if (os.path.exists(dest_file)
+                and filecmp.cmp(source_file, dest_file)):
+                ignored_files.append(source_file)
+                continue
 
-                dest_file = beets.util.unique_path(dest_file)
-                beets.util.mkdirall(dest_file)
+            dest_file = beets.util.unique_path(dest_file)
+            beets.util.mkdirall(dest_file)
 
-                # TODO: detect if beets was called with 'move' and override config
-                # option here
+            # TODO: detect if beets was called with 'move' and override config
+            # option here
 
-                if config['import']['move']:
+            if config['import']['move']:
+                self._move_artifact(source_file, dest_file)
+            else:
+                if reimport:
+                    # This is a reimport
+                    # files are already in the library directory
                     self._move_artifact(source_file, dest_file)
+                    #TODO: add prune empty source dirs
                 else:
-                    if reimport:
-                        # This is a reimport
-                        # files are already in the library directory
-                        self._move_artifact(source_file, dest_file)
-                        #TODO: add prune empty source dirs
-                    else:
-                        # A normal import, just copy
-                        self._copy_artifact(source_file, dest_file)
+                    # A normal import, just copy
+                    self._copy_artifact(source_file, dest_file)
 
 
         if self.print_ignored and ignored_files:
