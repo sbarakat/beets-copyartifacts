@@ -28,7 +28,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
         self.path_formats = [c for c in beets.ui.get_path_formats() if c[0][:4] == u'ext:']
 
         self.register_listener('import_task_files', self.import_event)
-        #XXX: self.register_listener('item_moved', self.move_event)
+        self.register_listener('item_moved', self.move_event)
 
     def _destination(self, filename, mapping):
         '''Returns a destination path a file should be moved to. The filename
@@ -71,15 +71,17 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         return value
 
-    def _generate_mapping(self, imported_item, album_path):
+    def _generate_mapping(self, item, album_path):
         mapping = {
-            'artist': imported_item.artist or u'None',
-            'albumartist': imported_item.albumartist or u'None',
-            'album': imported_item.album or u'None',
+            'artist': item.artist or u'None',
+            'albumartist': item.albumartist or u'None',
+            'album': item.album or u'None',
         }
         for key in mapping:
             mapping[key] = self._format(mapping[key])
+
         mapping['albumpath'] = beets.util.displayable_path(album_path)
+
         return mapping
 
     def import_event(self, task, session):
@@ -127,8 +129,8 @@ class CopyArtifactsPlugin(BeetsPlugin):
         self.process_artifacts(source_path, source_files, ignored_files, reimport, mapping)
 
     def move_event(self, item, source, destination):
-        print '-------------------------------------'
         source_path = os.path.dirname(source)
+        album_path = os.path.dirname(destination)
 
         source_files = []
         ignored_files = []
@@ -138,18 +140,19 @@ class CopyArtifactsPlugin(BeetsPlugin):
             for filename in files:
                 source_file = os.path.join(root, filename)
 
+                # Skip any files extensions handled by beets
                 file_ext = os.path.splitext(filename)[1]
                 if len(file_ext) > 1 and file_ext[1:] in TYPES:
                     continue
-                #print filename
 
                 if '.*' in self.extensions or file_ext in self.extensions:
                     source_files.append(source_file)
                 else:
                     ignored_files.append(source_file)
 
-        print source_files
-        print ignored_files
+        mapping = self._generate_mapping(item, album_path)
+
+        self.process_artifacts(source_path, source_files, ignored_files, False, mapping)
 
     def process_artifacts(self, source_path, source_files, ignored_files, reimport=False, mapping=None):
 
