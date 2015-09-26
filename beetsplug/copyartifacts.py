@@ -103,10 +103,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
             for filename in files:
                 source_file = os.path.join(root, filename)
 
-                # Skip music files (already imported)
-                if source_file in task.old_paths:
-                    continue
-
                 # Skip file, usually reimports to same dir
                 if album_path == os.path.dirname(source_file):
                     continue
