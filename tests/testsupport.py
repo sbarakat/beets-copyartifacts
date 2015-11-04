@@ -40,7 +40,9 @@ class CopyArtifactsTestCase(_common.TestCase):
         # Exercise
         # Run the importer
         self.importer.run()
-       
+        # Fake the occurence of the cli_exit event
+        plugins.send('cli_exit', lib=self.lib)
+
         # Teardown
         if plugins._instances:
             classes = list(plugins._classes)
@@ -59,9 +61,9 @@ class CopyArtifactsTestCase(_common.TestCase):
         self.lib = library.Library(self.lib_db)
         self.lib.directory =self.lib_dir
         self.lib.path_formats = [
-            ('default', os.path.join('$artist', '$album', '$title')),
-            ('singleton:true', os.path.join('singletons', '$title')),
-            ('comp:true', os.path.join('compilations','$album', '$title')),
+            (u'default', os.path.join(u'$artist', u'$album', u'$title')),
+            (u'singleton:true', os.path.join(u'singletons', u'$title')),
+            (u'comp:true', os.path.join(u'compilations', u'$album', u'$title')),
         ]
 
     def _create_flat_import_dir(self):
@@ -168,7 +170,7 @@ class CopyArtifactsTestCase(_common.TestCase):
         config['import']['resume'] = False
 
         self.importer = TestImportSession(self.lib,
-                                logfile=None,
+                                loghandler=None,
                                 paths=[import_dir or self.import_dir],
                                 query=None)
     

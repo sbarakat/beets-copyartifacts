@@ -175,6 +175,8 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
 
     def process_artifacts(self, source_files, mapping, reimport=False):
+        if len(source_files) == 0:
+            return
 
         ignored_files = []
         source_path = os.path.dirname(source_files[0])
