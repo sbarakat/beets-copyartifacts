@@ -201,6 +201,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
             dest_file = beets.util.unique_path(dest_file)
             beets.util.mkdirall(dest_file)
+            dest_file = beets.util.bytestring_path(dest_file)
 
             # TODO: detect if beets was called with 'move' and override config
             # option here
@@ -224,7 +225,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
                 self._log.warning('   {0}', os.path.basename(f))
 
     def _copy_artifact(self, source_file, dest_file):
-        dest_file = beets.util.bytestring_path(dest_file)
         self._log.info('Copying artifact: {0}'.format(os.path.basename(dest_file)))
         beets.util.copy(source_file, dest_file)
 
@@ -233,7 +233,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
             # Sanity check for other plugins moving files
             return
 
-        dest_file = beets.util.bytestring_path(dest_file)
         self._log.info('Moving artifact: {0}'.format(os.path.basename(dest_file)))
         beets.util.move(source_file, dest_file)
 
