@@ -91,7 +91,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
     def import_event(self, task, session):
         # TODO: import_event is called after all move_events
-        self._log.debug('import_event')
         imported_item = task.imported_items()[0]
         album_path = os.path.dirname(imported_item.path)
 
@@ -137,7 +136,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
         self._dirs_seen.extend([source_path])
 
     def move_event(self, item, source, destination):
-        self._log.debug('move_event')
         source_path = os.path.dirname(source)
         dest_path = os.path.dirname(destination)
 
@@ -165,11 +163,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
         self._dirs_seen.extend([source_path])
 
     def process_events(self):
-        self._log.debug('CLI exit')
-        import json
-        self._log.debug('Dirs seen: {0}', self._dirs_seen)
-        self._log.debug(json.dumps(self._process_queue, indent=4, sort_keys=True))
-
         for item in self._process_queue:
             self.process_artifacts(item['files'], item['mapping'], False)
 
