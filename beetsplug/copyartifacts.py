@@ -91,7 +91,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
     def import_event(self, task, session):
         # TODO: import_event is called after all move_events
-        print 'import_event'
         imported_item = task.imported_items()[0]
         album_path = os.path.dirname(imported_item.path)
 
@@ -137,7 +136,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
         self._dirs_seen.extend([source_path])
 
     def move_event(self, item, source, destination):
-        print 'move_event'
         source_path = os.path.dirname(source)
         dest_path = os.path.dirname(destination)
 
@@ -165,11 +163,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
         self._dirs_seen.extend([source_path])
 
     def process_events(self):
-        print 'CLI exit'
-        import json
-        print self._dirs_seen
-        print json.dumps(self._process_queue, indent=4, sort_keys=True)
-
         for item in self._process_queue:
             self.process_artifacts(item['files'], item['mapping'], False)
 
@@ -208,6 +201,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
             dest_file = beets.util.unique_path(dest_file)
             beets.util.mkdirall(dest_file)
+            dest_file = beets.util.bytestring_path(dest_file)
 
             # TODO: detect if beets was called with 'move' and override config
             # option here
@@ -225,13 +219,12 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
 
         if self.print_ignored and ignored_files:
-            print 'Ignored files:'
+            self._log.warning('Ignored files:')
             for f in ignored_files:
-                print '   ', os.path.basename(f)
+                self._log.warning('   {0}', os.path.basename(f))
 
     def _copy_artifact(self, source_file, dest_file):
-        dest_file = beets.util.bytestring_path(dest_file)
-        print 'Copying artifact: {0}'.format(os.path.basename(dest_file))
+        self._log.info('Copying artifact: {0}'.format(os.path.basename(dest_file)))
         beets.util.copy(source_file, dest_file)
 
     def _move_artifact(self, source_file, dest_file):
@@ -239,8 +232,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
             # Sanity check for other plugins moving files
             return
 
-        dest_file = beets.util.bytestring_path(dest_file)
-        print 'Moving artifact: {0}'.format(os.path.basename(dest_file))
+        self._log.info('Moving artifact: {0}'.format(os.path.basename(dest_file)))
         beets.util.move(source_file, dest_file)
 
         dir_path = os.path.split(source_file)[0]
