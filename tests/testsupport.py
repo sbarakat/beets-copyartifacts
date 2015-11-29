@@ -11,16 +11,16 @@ from beets import plugins
 
 class CopyArtifactsTestCase(_common.TestCase):
     """
-    Provides common setup and teardown, a convenience method for exercising the 
+    Provides common setup and teardown, a convenience method for exercising the
     plugin/importer, tools to setup a library, a directory containing files
     that are to be imported and an import session. The class also provides stubs
     for the autotagging library and assertions helpers.
     """
     def setUp(self):
         super(CopyArtifactsTestCase, self).setUp()
-        
+
         self._setup_library()
-        
+
         # Install the DummyIO to capture anything directed to stdout
         self.io.install()
 
@@ -46,10 +46,10 @@ class CopyArtifactsTestCase(_common.TestCase):
         # Teardown
         if plugins._instances:
             classes = list(plugins._classes)
-            
+
             # Unregister listners
             del classes[0].listeners['import_task_files'][0]
-        
+
             # Delete the plugin instance so a new one gets created for each test
             del plugins._instances[classes[0]]
 
@@ -87,7 +87,7 @@ class CopyArtifactsTestCase(_common.TestCase):
         # Create artifact
         open(os.path.join(album_path, 'artifact.file'), 'a').close()
         open(os.path.join(album_path, 'artifact.file2'), 'a').close()
-        
+
         medium = self._create_medium(os.path.join(album_path, 'track_1.mp3'), 'full.mp3')
         self.import_media = [medium]
 
@@ -101,10 +101,10 @@ class CopyArtifactsTestCase(_common.TestCase):
         os.makedirs(album_path)
 
         open(os.path.join(album_path, u'\xe4rtifact.file'), 'a').close()
-        
+
         medium = self._create_medium(os.path.join(album_path, 'track_1.mp3'), 'full.mp3')
         self.import_media = [medium]
-    
+
     def _create_medium(self, path, resource_name):
         """
         Creates and saves a media file object located at path using resource_name
@@ -173,7 +173,7 @@ class CopyArtifactsTestCase(_common.TestCase):
                                 loghandler=None,
                                 paths=[import_dir or self.import_dir],
                                 query=None)
-    
+
     def assert_in_lib_dir(self, *segments):
         """
         Join the ``segments`` and assert that this path exists in the library
@@ -190,7 +190,7 @@ class CopyArtifactsTestCase(_common.TestCase):
 
     def assert_in_import_dir(self, *segments):
         """
-        Join the ``segments`` and assert that this path exists in the import 
+        Join the ``segments`` and assert that this path exists in the import
         directory
         """
         self.assertExists(os.path.join(self.import_dir, *segments))
@@ -207,3 +207,4 @@ class CopyArtifactsTestCase(_common.TestCase):
         Assert that there are ``count`` files in path formed by joining ``segments``
         """
         self.assertEqual(len([name for name in os.listdir(os.path.join(*segments))]), count)
+
