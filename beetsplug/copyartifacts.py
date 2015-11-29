@@ -213,7 +213,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
                     # This is a reimport
                     # files are already in the library directory
                     self._move_artifact(source_file, dest_file)
-                    #TODO: add prune empty source dirs
                 else:
                     # A normal import, just copy
                     self._copy_artifact(source_file, dest_file)
@@ -236,3 +235,5 @@ class CopyArtifactsPlugin(BeetsPlugin):
         self._log.info('Moving artifact: {0}'.format(os.path.basename(dest_file)))
         beets.util.move(source_file, dest_file)
 
+        dir_path = os.path.split(source_file)[0]
+        beets.util.prune_dirs(dir_path, clutter=config['clutter'].as_str_seq())
