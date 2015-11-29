@@ -23,9 +23,10 @@ if not os.path.isdir(beetspath):
 # Put the beets directory at the front of the search path
 sys.path.insert(0, beetspath)
 
-from testsupport import CopyArtifactsTestCase
+from test import helper
 from beets import plugins
 from beets import config
+from testsupport import CopyArtifactsTestCase
 
 import beetsplug
 
@@ -46,19 +47,30 @@ class CopyArtifactsPrintIgnoredTest(CopyArtifactsTestCase):
     def test_do_not_print_ignored_by_default(self):
         config['copyartifacts']['extensions'] = '.file'
 
-        self._run_importer()
+        with helper.capture_log() as logs:
+            self._run_importer()
 
         self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
-        self.assertTrue('Ignored files' not in self.io.getoutput())
+
+        # check output log
+        logs = [line for line in logs if line.startswith('copyartifacts:')]
+        self.assertEqual(logs, [])
 
     def test_print_ignored(self):
         config['copyartifacts']['print_ignored'] = True
         config['copyartifacts']['extensions'] = '.file'
 
-        self._run_importer()
+        with helper.capture_log() as logs:
+            self._run_importer()
 
         self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
-        self.assertTrue('Ignored files' in self.io.getoutput())
+
+        # check output log
+        logs = [line for line in logs if line.startswith('copyartifacts:')]
+        self.assertEqual(logs, [
+            'copyartifacts: Ignored files:',
+            'copyartifacts:    artifact.file2',
+        ])
 
 
 if __name__ == '__main__':
