@@ -59,7 +59,7 @@ class CopyArtifactsTestCase(_common.TestCase):
         os.mkdir(self.lib_dir)
 
         self.lib = library.Library(self.lib_db)
-        self.lib.directory =self.lib_dir
+        self.lib.directory = self.lib_dir
         self.lib.path_formats = [
             (u'default', os.path.join(u'$artist', u'$album', u'$title')),
             (u'singleton:true', os.path.join(u'singletons', u'$title')),
@@ -157,6 +157,7 @@ class CopyArtifactsTestCase(_common.TestCase):
               track_1.mp3
               artifact2.file
         """
+
     def _setup_import_session(self, import_dir=None,
             delete=False, threaded=False, copy=True,
             singletons=False, move=False, autotag=True):
