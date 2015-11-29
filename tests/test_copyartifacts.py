@@ -5,7 +5,7 @@ import sys
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest 
+    import unittest
 
 # Make sure we use local version of beetsplug and not system namespaced version for tests
 try:
@@ -39,19 +39,19 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
     """
     def setUp(self):
         super(CopyArtifactsReimportTest, self).setUp()
-        
+
         self._create_flat_import_dir()
         self._setup_import_session(autotag=False)
 
         config['copyartifacts']['extensions'] = '.file'
-        
+
         # Initial import
         self._run_importer()
-   
+
         # Change the path formats so the files in the library are relocated when reimported
         self.original_path_formats = list(self.lib.path_formats)
         self.lib.path_formats[0] = ('default', os.path.join('1$artist', '$album', '$title'))
-        
+
         self._setup_import_session(autotag=False, import_dir=self.lib_dir)
 
     def test_move_artifacts_with_copy_import(self):
@@ -72,20 +72,20 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
 
         self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
         self.assert_in_lib_dir('1Tag Artist', 'Tag Album', 'artifact.file')
-    
+
     def test_prune_empty_directories_with_move_import(self):
         config['import']['move'] = True
-        
+
         self._run_importer()
-        
+
         self.assert_not_in_lib_dir('Tag Artist')
 
     def test_do_nothing_when_paths_do_not_change_with_copy_import(self):
         self.lib.path_formats = self.original_path_formats
         self._setup_import_session(autotag=False, import_dir=self.lib_dir)
-        
+
         self._run_importer()
-        
+
         self.assert_number_of_files_in_dir(2, self.lib_dir, 'Tag Artist', 'Tag Album')
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
 
@@ -93,32 +93,32 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
         self.lib.path_formats = self.original_path_formats
         self._setup_import_session(autotag=False, import_dir=self.lib_dir)
         config['import']['move'] = True
-        
+
         self._run_importer()
-        
+
         self.assert_number_of_files_in_dir(2, self.lib_dir, 'Tag Artist', 'Tag Album')
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
-    
+
     def test_rename(self):
         config['paths']['ext:file'] = unicode('$albumpath/$artist - $album')
 
         self._run_importer()
 
         self.assert_in_lib_dir('1Tag Artist', 'Tag Album', 'Tag Artist - Tag Album.file')
-    
+
     @unittest.skip('Todo')
     def test_rename_when_paths_do_not_change(self):
         """
         This test considers the situation where the path format for a file extension
-        is changed and files already in the library are reimported and renamed to 
+        is changed and files already in the library are reimported and renamed to
         reflect the change
         """
         self.lib.path_formats = self.original_path_formats
         self._setup_import_session(autotag=False, import_dir=self.lib_dir)
         config['paths']['ext:file'] = unicode('$albumpath/$album')
-       
+
         self._run_importer()
-        
+
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'Tag Album.file')
 
 class CopyArtifactsFromNestedDirectoryTest(CopyArtifactsTestCase):
@@ -139,24 +139,24 @@ class CopyArtifactsFromFlatDirectoryTest(CopyArtifactsTestCase):
 
         self._create_flat_import_dir()
         self._setup_import_session(autotag=False)
- 
+
     def test_only_copy_artifacts_matching_configured_extension(self):
         config['copyartifacts']['extensions'] = '.file'
 
         self._run_importer()
-        
+
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
         self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
 
     def test_copy_all_artifacts_by_default(self):
         self._run_importer()
-        
+
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
-        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')   
+        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
 
     def test_copy_artifacts(self):
         self._run_importer()
-        
+
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
 
@@ -167,9 +167,9 @@ class CopyArtifactsFromFlatDirectoryTest(CopyArtifactsTestCase):
 
     def test_move_artifacts(self):
         config['import']['move'] = True
-        
+
         self._run_importer()
-        
+
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
         self.assert_not_in_import_dir('the_album', 'artifact.file')
@@ -183,7 +183,7 @@ class CopyArtifactsFromFlatDirectoryTest(CopyArtifactsTestCase):
         config['import']['move'] = True
 
         self._run_importer()
-        
+
         self.assert_not_in_import_dir('the_album')
 
     def test_do_nothing_when_not_copying_or_moving(self):
@@ -193,9 +193,9 @@ class CopyArtifactsFromFlatDirectoryTest(CopyArtifactsTestCase):
         """
         config['import']['copy'] = False
         config['import']['move'] = False
-       
+
         self._run_importer()
-      
+
         self.assert_number_of_files_in_dir(3, self.import_dir, 'the_album')
         self.assert_in_import_dir('the_album', 'artifact.file')
         self.assert_in_import_dir('the_album', 'artifact.file2')
@@ -231,16 +231,16 @@ class CopyArtifactsPrintIgnoredTest(CopyArtifactsTestCase):
 
     def test_do_not_print_ignored_by_default(self):
         config['copyartifacts']['extensions'] = '.file'
-        
+
         self._run_importer()
 
         self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
         self.assertTrue('Ignored files' not in self.io.getoutput())
- 
+
     def test_print_ignored(self):
         config['copyartifacts']['print_ignored'] = True
         config['copyartifacts']['extensions'] = '.file'
-        
+
         self._run_importer()
 
         self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
@@ -252,22 +252,22 @@ class CopyArtifactsUnicodeFilename(CopyArtifactsTestCase):
     """
     def setUp(self):
         super(CopyArtifactsUnicodeFilename, self).setUp()
-        
+
         self._create_import_dir_with_unicode_character_in_artifact_name()
         self._setup_import_session(autotag=False)
-        
+
         config['copyartifacts']['extensions'] = '.file'
 
     def test_copy(self):
         self._run_importer()
-        
+
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', u'\xe4rtifact.file')
 
     def test_move(self):
         config['import']['move'] = True
         self._run_importer()
-        
+
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', u'\xe4rtifact.file')
-        
+
 if __name__ == '__main__':
     unittest.main()
