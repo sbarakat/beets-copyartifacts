@@ -48,7 +48,8 @@ class CopyArtifactsTestCase(_common.TestCase):
             classes = list(plugins._classes)
 
             # Unregister listners
-            del classes[0].listeners['import_task_files'][0]
+            for event in classes[0].listeners:
+                del classes[0].listeners[event][0]
 
             # Delete the plugin instance so a new one gets created for each test
             del plugins._instances[classes[0]]
