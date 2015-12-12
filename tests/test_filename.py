@@ -34,12 +34,12 @@ beetsplug.__path__.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file
 plugins.load_plugins(['copyartifacts'])
 
 
-class CopyArtifactsUnicodeFilename(CopyArtifactsTestCase):
+class CopyArtifactsFilename(CopyArtifactsTestCase):
     """
     Tests to check handling of artifacts with filenames containing unicode characters
     """
     def setUp(self):
-        super(CopyArtifactsUnicodeFilename, self).setUp()
+        super(CopyArtifactsFilename, self).setUp()
 
         self._set_import_dir()
         self.album_path = os.path.join(self.import_dir, 'the_album')
