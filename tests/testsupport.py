@@ -92,21 +92,7 @@ class CopyArtifactsTestCase(_common.TestCase):
         medium = self._create_medium(os.path.join(album_path, 'track_1.mp3'), 'full.mp3')
         self.import_media = [medium]
 
-    def _create_import_dir_with_unicode_character_in_artifact_name(self):
-        """
-        Create a flat import directory containing an artifact with file name
-        containing unicode character.
-        """
-        self._set_import_dir()
-        album_path = os.path.join(self.import_dir, 'the_album')
-        os.makedirs(album_path)
-
-        open(os.path.join(album_path, u'\xe4rtifact.file'), 'a').close()
-
-        medium = self._create_medium(os.path.join(album_path, 'track_1.mp3'), 'full.mp3')
-        self.import_media = [medium]
-
-    def _create_medium(self, path, resource_name):
+    def _create_medium(self, path, resource_name, album=None):
         """
         Creates and saves a media file object located at path using resource_name
         from the beets test resources directory as initial data
@@ -116,7 +102,7 @@ class CopyArtifactsTestCase(_common.TestCase):
 
         metadata = {
                      'artist': 'Tag Artist',
-                     'album':  'Tag Album',
+                     'album':  album or 'Tag Album',
                      'albumartist':  None,
                      'mb_trackid': None,
                      'mb_albumid': None,
@@ -130,8 +116,10 @@ class CopyArtifactsTestCase(_common.TestCase):
         # Set metadata
         metadata['track'] = 1
         metadata['title'] = 'Tag Title 1'
-        for attr in metadata: setattr(medium, attr, metadata[attr])
+        for attr in metadata:
+            setattr(medium, attr, metadata[attr])
         medium.save()
+
         return medium
 
     def _set_import_dir(self):

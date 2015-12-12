@@ -63,6 +63,12 @@ class CopyArtifactsPlugin(BeetsPlugin):
         # Get template funcs and evaluate against mapping
         funcs = DefaultTemplateFunctions().functions()
         file_path = subpath_tmpl.substitute(mapping, funcs) + file_ext
+
+        # Sanitize filename
+        filename = beets.util.sanitize_path(os.path.basename(file_path))
+        dirname = os.path.dirname(file_path)
+        file_path = os.path.join(dirname, filename)
+
         return file_path
 
     def _format(self, value):
