@@ -117,4 +117,4 @@ License
 Copyright (c) 2015 Sami Barakat
 
 Licensed under the `MIT
-license <https://github.com/sbarakat/beets-copyartifacts/blob/master/MIT-LICENSE.txt>`__.
+license <https://github.com/sbarakat/beets-copyartifacts/blob/master/LICENSE>`__.
