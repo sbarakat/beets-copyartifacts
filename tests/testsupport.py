@@ -9,6 +9,9 @@ from beets import mediafile
 from beets import config
 from beets import plugins
 
+import logging
+log = logging.getLogger("beets")
+
 class CopyArtifactsTestCase(_common.TestCase):
     """
     Provides common setup and teardown, a convenience method for exercising the
@@ -54,6 +57,9 @@ class CopyArtifactsTestCase(_common.TestCase):
             # Delete the plugin instance so a new one gets created for each test
             del plugins._instances[classes[0]]
 
+        log.debug("--- library structure")
+        self._list_files(self.lib_dir)
+
     def _setup_library(self):
         self.lib_db = os.path.join(self.temp_dir, 'testlib.blb')
         self.lib_dir = os.path.join(self.temp_dir, 'testlib_dir')
@@ -91,6 +97,9 @@ class CopyArtifactsTestCase(_common.TestCase):
 
         medium = self._create_medium(os.path.join(album_path, 'track_1.mp3'), 'full.mp3')
         self.import_media = [medium]
+
+        log.debug("--- import directory created")
+        self._list_files(album_path)
 
     def _create_medium(self, path, resource_name, album=None):
         """
@@ -163,6 +172,15 @@ class CopyArtifactsTestCase(_common.TestCase):
                                 loghandler=None,
                                 paths=[import_dir or self.import_dir],
                                 query=None)
+
+    def _list_files(self, startpath):
+        for root, dirs, files in os.walk(startpath):
+            level = root.replace(startpath, '').count(os.sep)
+            indent = ' ' * 4 * (level)
+            log.debug('{}{}/'.format(indent, os.path.basename(root)))
+            subindent = ' ' * 4 * (level + 1)
+            for f in files:
+                log.debug('{}{}'.format(subindent, f))
 
     def assert_in_lib_dir(self, *segments):
         """
