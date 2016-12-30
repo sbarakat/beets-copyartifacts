@@ -14,7 +14,7 @@ except KeyError:
     pass
 
 # Get the path to the beets source
-beetspath = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, 'beets'))
+beetspath = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'beets'))
 
 # Check that the beets directory exists
 if not os.path.isdir(beetspath):
