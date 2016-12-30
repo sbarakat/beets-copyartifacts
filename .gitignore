@@ -2,4 +2,5 @@
 *.swp
 dist/*
 build/*
+env/*
 beets_copyartifacts.egg-info/*
