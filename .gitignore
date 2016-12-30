@@ -3,4 +3,5 @@
 dist/*
 build/*
 env/*
+beets/*
 beets_copyartifacts.egg-info/*
