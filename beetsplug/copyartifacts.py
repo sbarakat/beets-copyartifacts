@@ -30,9 +30,8 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         self.path_formats = [c for c in beets.ui.get_path_formats() if c[0][:4] == u'ext:']
 
-        self.register_listener('import_task_files', self.import_event)
-        # XXX: now that we have a moved event, is there any need in the import event?
-        self.register_listener('item_moved', self.move_event)
+        self.register_listener('item_moved', self.collect_artifacts)
+        self.register_listener('item_copied', self.collect_artifacts)
         self.register_listener('cli_exit', self.process_events)
 
     def _destination(self, filename, mapping):
@@ -95,53 +94,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         return mapping
 
-    def import_event(self, task, session):
-        # TODO: import_event is called after all move_events
-        imported_item = task.imported_items()[0]
-        album_path = os.path.dirname(imported_item.path)
-
-        reimport = False
-
-        source_path = ''
-        try:
-            source_path = task.paths[0]
-        except TypeError:
-            source_path = os.path.dirname(task.old_paths[0])
-
-        # Check if this path has already been processed
-        if source_path in self._dirs_seen:
-            return
-
-        non_handled_files = []
-        for root, dirs, files in beets.util.sorted_walk(
-                    source_path, ignore=config['ignore'].as_str_seq()):
-            for filename in files:
-                source_file = os.path.join(root, filename)
-
-                # Skip file, usually reimports to same dir
-                if album_path == os.path.dirname(source_file):
-                    continue
-
-                # Skip any files extensions handled by beets
-                file_ext = os.path.splitext(filename)[1]
-                if len(file_ext) > 1 and file_ext[1:] in TYPES:
-                    continue
-
-                non_handled_files.append(source_file)
-
-        if task.replaced_items[imported_item]:
-            # these will be reimports when dir has changed
-            reimport = True
-
-        self._process_queue.extend([{
-            'files': non_handled_files,
-            'mapping': self._generate_mapping(imported_item, album_path)
-            # TODO: add reimport var, may be useless if we get rid of
-            # import_event()
-        }])
-        self._dirs_seen.extend([source_path])
-
-    def move_event(self, item, source, destination):
+    def collect_artifacts(self, item, source, destination):
         source_path = os.path.dirname(source)
         dest_path = os.path.dirname(destination)
 
@@ -171,7 +124,6 @@ class CopyArtifactsPlugin(BeetsPlugin):
     def process_events(self):
         for item in self._process_queue:
             self.process_artifacts(item['files'], item['mapping'], False)
-
 
     def process_artifacts(self, source_files, mapping, reimport=False):
         if len(source_files) == 0:
@@ -243,3 +195,4 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         dir_path = os.path.split(source_file)[0]
         beets.util.prune_dirs(dir_path, clutter=config['clutter'].as_str_seq())
+
