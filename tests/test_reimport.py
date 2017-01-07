@@ -63,7 +63,8 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
     def test_reimport_artifacts_with_copy(self):
         # Cause files to relocate when reimported
         self.lib.path_formats[0] = ('default', os.path.join('1$artist', '$album', '$title'))
-        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
+        self._setup_import_session(autotag=False,
+                                   import_dir=self.lib_dir)
 
         log.debug('--- second import')
         self._run_importer()
@@ -74,8 +75,9 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
     def test_reimport_artifacts_with_move(self):
         # Cause files to relocate when reimported
         self.lib.path_formats[0] = ('default', os.path.join('1$artist', '$album', '$title'))
-        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
-        config['import']['move'] = True
+        self._setup_import_session(autotag=False,
+                                   import_dir=self.lib_dir,
+                                   move=True)
 
         log.debug('--- second import')
         self._run_importer()
@@ -91,7 +93,8 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
         """
         # Cause files to relocate when reimported
         self.lib.path_formats[0] = ('default', os.path.join('1$artist', '$album', '$title'))
-        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
+        self._setup_import_session(autotag=False,
+                                   import_dir=self.lib_dir)
 
         log.debug('--- second import')
         self._run_importer()
@@ -103,8 +106,9 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
     def test_prune_empty_directories_with_move_import(self):
         # Cause files to relocate when reimported
         self.lib.path_formats[0] = ('default', os.path.join('1$artist', '$album', '$title'))
-        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
-        config['import']['move'] = True
+        self._setup_import_session(autotag=False,
+                                   import_dir=self.lib_dir,
+                                   move=True)
 
         log.debug('--- second import')
         self._run_importer()
@@ -113,7 +117,8 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
         self.assert_in_lib_dir('1Tag Artist', 'Tag Album', 'artifact.file')
 
     def test_do_nothing_when_paths_do_not_change_with_copy_import(self):
-        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
+        self._setup_import_session(autotag=False,
+                                   import_dir=self.lib_dir)
 
         log.debug('--- second import')
         self._run_importer()
@@ -122,8 +127,9 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
         self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
 
     def test_do_nothing_when_paths_do_not_change_with_move_import(self):
-        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
-        config['import']['move'] = True
+        self._setup_import_session(autotag=False,
+                                   import_dir=self.lib_dir,
+                                   move=True)
 
         log.debug('--- second import')
         self._run_importer()
@@ -133,7 +139,8 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
 
     def test_rename_with_copy_import(self):
         config['paths']['ext:file'] = unicode(os.path.join('$albumpath', '$artist - $album'))
-        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
+        self._setup_import_session(autotag=False,
+                                   import_dir=self.lib_dir)
 
         log.debug('--- second import')
         self._run_importer()
@@ -143,8 +150,9 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
 
     def test_rename_with_move_import(self):
         config['paths']['ext:file'] = unicode(os.path.join('$albumpath', '$artist - $album'))
-        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
-        config['import']['move'] = True
+        self._setup_import_session(autotag=False,
+                                   import_dir=self.lib_dir,
+                                   move=True)
 
         log.debug('--- second import')
         self._run_importer()
@@ -159,8 +167,9 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
         reflect the change
         """
         config['paths']['ext:file'] = unicode(os.path.join('$albumpath', '$album'))
-        self._setup_import_session(autotag=False, import_dir=self.lib_dir)
-        config['import']['move'] = True
+        self._setup_import_session(autotag=False,
+                                   import_dir=self.lib_dir,
+                                   move=True)
 
         log.debug('--- second import')
         self._run_importer()
