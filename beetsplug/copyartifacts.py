@@ -74,7 +74,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
         '''Replace path separators in value
             - ripped from beets/dbcore/db.py
         '''
-        sep_repl = beets.config['path_sep_replace'].get(unicode)
+        sep_repl = beets.config['path_sep_replace'].as_str()
         for sep in (os.path.sep, os.path.altsep):
             if sep:
                 value = value.replace(sep, sep_repl)
