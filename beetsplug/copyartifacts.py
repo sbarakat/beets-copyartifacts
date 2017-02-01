@@ -70,7 +70,8 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         return file_path
 
-    def _format(self, value):
+    # XXX: may be better to use FormattedMapping class from beets/dbcore/db.py
+    def _get_formatted(self, value):
         '''Replace path separators in value
             - ripped from beets/dbcore/db.py
         '''
@@ -88,7 +89,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
             'album': item.album or u'None',
         }
         for key in mapping:
-            mapping[key] = self._format(mapping[key])
+            mapping[key] = self._get_formatted(mapping[key])
 
         mapping['albumpath'] = beets.util.displayable_path(album_path)
 
