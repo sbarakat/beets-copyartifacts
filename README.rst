@@ -1,6 +1,9 @@
 copyartifacts plugin for beets
 ==============================
 
+.. image:: https://travis-ci.org/sbarakat/beets-copyartifacts.svg?branch=master
+    :target: https://travis-ci.org/sbarakat/beets-copyartifacts
+
 A plugin that moves non-music files during the import process.
 
 This is a plugin for `beets <http://beets.radbox.org/>`__: a music
