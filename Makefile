@@ -1,5 +1,5 @@
 init:
-	git clone https://github.com/beetbox/beets.git beets
+	git clone --depth 1 https://github.com/beetbox/beets.git beets
 	virtualenv env
 	./env/bin/pip install -r requirements.txt
 	./env/bin/pip install -e .
