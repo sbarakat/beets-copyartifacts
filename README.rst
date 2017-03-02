@@ -114,7 +114,7 @@ Please report any issues you may have and feel free to contribute.
 License
 -------
 
-Copyright (c) 2015 Sami Barakat
+Copyright (c) 2015-2017 Sami Barakat
 
 Licensed under the `MIT
 license <https://github.com/sbarakat/beets-copyartifacts/blob/master/LICENSE>`__.
