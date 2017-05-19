@@ -12,13 +12,21 @@ library manager and much more.
 Installing
 ----------
 
-Installation of the plugin can be done using pip:
+Stable
+~~~~~~
+
+The stable version of the plugin is available from PyPI. Installation can be done using pip:
 
 ::
 
     pip install beets-copyartifacts
 
-or by using these commands:
+If you get permission errors try running it with ``sudo``
+
+Development
+~~~~~~~~~~~
+
+The development version can be installed from GitHub by using these commands:
 
 ::
 
@@ -28,14 +36,14 @@ or by using these commands:
 
 If you get permission errors try running it with ``sudo``
 
-You will then need to enable the plugin in beets' config.yaml
+Configuration
+-------------
+
+You will need to enable the plugin in beets' config.yaml
 
 ::
 
     plugins: copyartifacts
-
-Configuration
--------------
 
 It can copy files by file extenstion:
 
