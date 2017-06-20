@@ -9,6 +9,14 @@ from beets import mediafile
 from beets import config
 from beets import plugins
 
+# Make sure the development versions of the plugins are used
+import beetsplug  # noqa: E402
+beetsplug.__path__ = [os.path.abspath(
+    os.path.join(__file__, '..', '..', 'beetsplug')
+)]
+
+from beetsplug import copyartifacts
+
 import logging
 log = logging.getLogger("beets")
 
@@ -21,6 +29,8 @@ class CopyArtifactsTestCase(_common.TestCase):
     """
     def setUp(self):
         super(CopyArtifactsTestCase, self).setUp()
+
+        plugins._classes = set([copyartifacts.CopyArtifactsPlugin])
 
         self._setup_library()
 

@@ -7,12 +7,6 @@ try:
 except ImportError:
     import unittest
 
-# Make sure we use local version of beetsplug and not system namespaced version for tests
-#try:
-#    del sys.modules["beetsplug"]
-#except KeyError:
-#    pass
-
 # Get the path to the beets source
 beetspath = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'beets'))
 
@@ -24,15 +18,8 @@ if not os.path.isdir(beetspath):
 sys.path.insert(0, beetspath)
 
 from test import helper
-from beets import plugins
 from beets import config
 from testsupport import CopyArtifactsTestCase
-
-from beetsplug import copyartifacts
-
-# Add copyartifacts path to pluginpath and load
-#beetsplug.__path__.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'beetsplug')))
-#plugins.load_plugins(['copyartifacts'])
 
 class CopyArtifactsPrintIgnoredTest(CopyArtifactsTestCase):
     """
