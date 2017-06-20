@@ -7,18 +7,7 @@ try:
 except ImportError:
     import unittest
 
-# Get the path to the beets source
-beetspath = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'beets'))
-
-# Check that the beets directory exists
-if not os.path.isdir(beetspath):
-    raise RuntimeError("A directory named beets with the beets source needs to be parallel to this plugin's source directory")
-
-# Put the beets directory at the front of the search path
-sys.path.insert(0, beetspath)
-
-from helper import CopyArtifactsTestCase
-from test import helper
+from helper import CopyArtifactsTestCase, capture_log
 from beets import config
 
 class CopyArtifactsPrintIgnoredTest(CopyArtifactsTestCase):
@@ -34,7 +23,7 @@ class CopyArtifactsPrintIgnoredTest(CopyArtifactsTestCase):
     def test_do_not_print_ignored_by_default(self):
         config['copyartifacts']['extensions'] = '.file'
 
-        with helper.capture_log() as logs:
+        with capture_log() as logs:
             self._run_importer()
 
         self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
@@ -47,7 +36,7 @@ class CopyArtifactsPrintIgnoredTest(CopyArtifactsTestCase):
         config['copyartifacts']['print_ignored'] = True
         config['copyartifacts']['extensions'] = '.file'
 
-        with helper.capture_log() as logs:
+        with capture_log() as logs:
             self._run_importer()
 
         self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')

@@ -1,10 +1,14 @@
 import os
+import sys
+import six
 import shutil
+from contextlib import contextmanager
+from enum import Enum
 
-from test.test_importer import TestImportSession
-from test import _common
+import _common
 
 from beets import library
+from beets import importer
 from beets import mediafile
 from beets import config
 from beets import plugins
@@ -19,6 +23,29 @@ from beetsplug import copyartifacts
 
 import logging
 log = logging.getLogger("beets")
+
+
+class LogCapture(logging.Handler):
+
+    def __init__(self):
+        logging.Handler.__init__(self)
+        self.messages = []
+
+    def emit(self, record):
+        self.messages.append(six.text_type(record.msg))
+
+
+@contextmanager
+def capture_log(logger='beets'):
+    capture = LogCapture()
+    log = logging.getLogger(logger)
+    log.addHandler(capture)
+    try:
+        yield capture.messages
+    finally:
+        log.removeHandler(capture)
+
+
 
 class CopyArtifactsTestCase(_common.TestCase):
     """
@@ -225,4 +252,67 @@ class CopyArtifactsTestCase(_common.TestCase):
         Assert that there are ``count`` files in path formed by joining ``segments``
         """
         self.assertEqual(len([name for name in os.listdir(os.path.join(*segments))]), count)
+
+
+class TestImportSession(importer.ImportSession):
+    """ImportSession that can be controlled programaticaly.
+
+    >>> lib = Library(':memory:')
+    >>> importer = TestImportSession(lib, paths=['/path/to/import'])
+    >>> importer.add_choice(importer.action.SKIP)
+    >>> importer.add_choice(importer.action.ASIS)
+    >>> importer.default_choice = importer.action.APPLY
+    >>> importer.run()
+
+    This imports ``/path/to/import`` into `lib`. It skips the first
+    album and imports thesecond one with metadata from the tags. For the
+    remaining albums, the metadata from the autotagger will be applied.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(TestImportSession, self).__init__(*args, **kwargs)
+        self._choices = []
+        self._resolutions = []
+
+    default_choice = importer.action.APPLY
+
+    def add_choice(self, choice):
+        self._choices.append(choice)
+
+    def clear_choices(self):
+        self._choices = []
+
+    def choose_match(self, task):
+        try:
+            choice = self._choices.pop(0)
+        except IndexError:
+            choice = self.default_choice
+
+        if choice == importer.action.APPLY:
+            return task.candidates[0]
+        elif isinstance(choice, int):
+            return task.candidates[choice - 1]
+        else:
+            return choice
+
+    choose_item = choose_match
+
+    Resolution = Enum('Resolution', 'REMOVE SKIP KEEPBOTH')
+
+    default_resolution = 'REMOVE'
+
+    def add_resolution(self, resolution):
+        assert isinstance(resolution, self.Resolution)
+        self._resolutions.append(resolution)
+
+    def resolve_duplicate(self, task, found_duplicates):
+        try:
+            res = self._resolutions.pop(0)
+        except IndexError:
+            res = self.default_resolution
+
+        if res == self.Resolution.SKIP:
+            task.set_choice(importer.action.SKIP)
+        elif res == self.Resolution.REMOVE:
+            task.should_remove_duplicates = True
 

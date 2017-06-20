@@ -7,16 +7,6 @@ try:
 except ImportError:
     import unittest
 
-# Get the path to the beets source
-beetspath = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'beets'))
-
-# Check that the beets directory exists
-if not os.path.isdir(beetspath):
-    raise RuntimeError("A directory named beets with the beets source needs to be parallel to this plugin's source directory")
-
-# Put the beets directory at the front of the search path
-sys.path.insert(0, beetspath)
-
 from helper import CopyArtifactsTestCase
 from beets import config
 
