@@ -17,7 +17,7 @@ if not os.path.isdir(beetspath):
 # Put the beets directory at the front of the search path
 sys.path.insert(0, beetspath)
 
-from testsupport import CopyArtifactsTestCase
+from helper import CopyArtifactsTestCase
 from beets import config
 
 class CopyArtifactsFilename(CopyArtifactsTestCase):
