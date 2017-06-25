@@ -1,8 +1,8 @@
 import sys
 import os
-import tempfile
 import shutil
 import unittest
+from tempfile import mkdtemp
 
 import beets
 from beets import util
@@ -49,7 +49,7 @@ class TestCase(unittest.TestCase, Assertions):
 
         # Direct paths to a temporary directory. Tests can also use this
         # temporary directory.
-        self.temp_dir = util.bytestring_path(tempfile.mkdtemp())
+        self.create_temp_dir()
 
         beets.config['statefile'] = \
             util.py3_path(os.path.join(self.temp_dir, b'state.pickle'))
@@ -67,8 +67,8 @@ class TestCase(unittest.TestCase, Assertions):
         self.io = DummyIO()
 
     def tearDown(self):
-        if os.path.isdir(self.temp_dir):
-            shutil.rmtree(self.temp_dir)
+        self.remove_temp_dir()
+
         if self._old_home is None:
             del os.environ['HOME']
         else:
@@ -77,6 +77,19 @@ class TestCase(unittest.TestCase, Assertions):
 
         beets.config.clear()
         beets.config._materialized = False
+
+    def create_temp_dir(self):
+        """Create a temporary directory and assign it into
+        `self.temp_dir`. Call `remove_temp_dir` later to delete it.
+        """
+        temp_dir = mkdtemp()
+        self.temp_dir = util.bytestring_path(temp_dir)
+
+    def remove_temp_dir(self):
+        """Delete the temporary directory created by `create_temp_dir`.
+        """
+        shutil.rmtree(self.temp_dir)
+
 
 
 # Mock I/O.

@@ -5,8 +5,9 @@ import shutil
 from contextlib import contextmanager
 from enum import Enum
 
-import _common
+import tests._common as _common
 
+from beets import util
 from beets import library
 from beets import importer
 from beets import mediafile
@@ -98,8 +99,9 @@ class CopyArtifactsTestCase(_common.TestCase):
         self._list_files(self.lib_dir)
 
     def _setup_library(self):
-        self.lib_db = os.path.join(self.temp_dir, 'testlib.blb')
-        self.lib_dir = os.path.join(self.temp_dir, 'testlib_dir')
+        self.lib_db = os.path.join(self.temp_dir, b'testlib.blb')
+        self.lib_dir = os.path.join(self.temp_dir, b'testlib_dir')
+
         os.mkdir(self.lib_dir)
 
         self.lib = library.Library(self.lib_db)
@@ -125,14 +127,14 @@ class CopyArtifactsTestCase(_common.TestCase):
         """
         self._set_import_dir()
 
-        album_path = os.path.join(self.import_dir, 'the_album')
+        album_path = os.path.join(self.import_dir, b'the_album')
         os.makedirs(album_path)
 
         # Create artifact
-        open(os.path.join(album_path, 'artifact.file'), 'a').close()
-        open(os.path.join(album_path, 'artifact.file2'), 'a').close()
+        open(os.path.join(album_path, b'artifact.file'), 'a').close()
+        open(os.path.join(album_path, b'artifact.file2'), 'a').close()
 
-        medium = self._create_medium(os.path.join(album_path, 'track_1.mp3'), 'full.mp3')
+        medium = self._create_medium(os.path.join(album_path, b'track_1.mp3'), b'full.mp3')
         self.import_media = [medium]
 
         log.debug("--- import directory created")
@@ -172,7 +174,7 @@ class CopyArtifactsTestCase(_common.TestCase):
         """
         Sets the import_dir and ensures that it is empty.
         """
-        self.import_dir = os.path.join(self.temp_dir, 'testsrcdir')
+        self.import_dir = os.path.join(self.temp_dir, b'testsrcdir')
         if os.path.isdir(self.import_dir):
             shutil.rmtree(self.import_dir)
 
@@ -211,13 +213,14 @@ class CopyArtifactsTestCase(_common.TestCase):
                                 query=None)
 
     def _list_files(self, startpath):
-        for root, dirs, files in os.walk(startpath):
-            level = root.replace(startpath, '').count(os.sep)
-            indent = ' ' * 4 * (level)
-            log.debug('{}{}/'.format(indent, os.path.basename(root)))
-            subindent = ' ' * 4 * (level + 1)
-            for f in files:
-                log.debug('{}{}'.format(subindent, f))
+        #for root, dirs, files in os.walk(startpath):
+        #    level = root.replace(startpath, '').count(os.sep)
+        #    indent = ' ' * 4 * (level)
+        #    log.debug('{}{}/'.format(indent, os.path.basename(root)))
+        #    subindent = ' ' * 4 * (level + 1)
+        #    for f in files:
+        #        log.debug('{}{}'.format(subindent, f))
+        pass
 
     def assert_in_lib_dir(self, *segments):
         """
