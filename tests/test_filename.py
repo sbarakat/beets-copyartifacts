@@ -1,12 +1,6 @@
 import os
 import sys
 
-# Use unittest2 on Python < 2.7
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
-
 from helper import CopyArtifactsTestCase
 from beets import config
 
@@ -58,8 +52,4 @@ class CopyArtifactsFilename(CopyArtifactsTestCase):
         self._run_importer()
 
         self.assert_in_lib_dir('Tag Artist', 'Tag Album_', u'Tag Artist - Tag Album_.file')
-
-
-if __name__ == '__main__':
-    unittest.main()
 

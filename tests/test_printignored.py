@@ -1,12 +1,6 @@
 import os
 import sys
 
-# Use unittest2 on Python < 2.7
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
-
 from helper import CopyArtifactsTestCase, capture_log
 from beets import config
 
@@ -47,8 +41,4 @@ class CopyArtifactsPrintIgnoredTest(CopyArtifactsTestCase):
             'copyartifacts: Ignored files:',
             'copyartifacts:    artifact.file2',
         ])
-
-
-if __name__ == '__main__':
-    unittest.main()
 

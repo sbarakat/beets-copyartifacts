@@ -1,12 +1,6 @@
 import os
 import sys
 
-# Use unittest2 on Python < 2.7
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
-
 from tests.helper import CopyArtifactsTestCase
 from beets import config
 
@@ -156,6 +150,4 @@ class CopyArtifactsReimportTest(CopyArtifactsTestCase):
 
 
 
-if __name__ == '__main__':
-    unittest.main()
 
