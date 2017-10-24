@@ -1,7 +1,7 @@
 import os
 import sys
 
-from helper import CopyArtifactsTestCase
+from tests.helper import CopyArtifactsTestCase
 from beets import config
 
 class CopyArtifactsFromNestedDirectoryTest(CopyArtifactsTestCase):

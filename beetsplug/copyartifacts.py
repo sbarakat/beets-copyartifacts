@@ -46,7 +46,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         for query, path_format in self.path_formats:
             query_ext = '.' + query[4:]
-            if query_ext == file_ext:
+            if query_ext == file_ext.decode('utf8'):
                 break
         else:
             # No query matched; use original filename
@@ -61,7 +61,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
         # Get template funcs and evaluate against mapping
         funcs = DefaultTemplateFunctions().functions()
-        file_path = subpath_tmpl.substitute(mapping, funcs) + file_ext
+        file_path = subpath_tmpl.substitute(mapping, funcs) + file_ext.decode('utf8')
 
         # Sanitize filename
         filename = beets.util.sanitize_path(os.path.basename(file_path))
@@ -111,7 +111,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
                 # Skip any files extensions handled by beets
                 file_ext = os.path.splitext(filename)[1]
-                if len(file_ext) > 1 and file_ext[1:] in TYPES:
+                if len(file_ext) > 1 and file_ext.decode('utf8')[1:] in TYPES:
                     continue
 
                 non_handled_files.append(source_file)
@@ -148,7 +148,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
             # Skip extensions not handled by plugin
             file_ext = os.path.splitext(filename)[1]
             if ('.*' not in self.extensions
-                and file_ext not in self.extensions):
+                and file_ext.decode('utf8') not in self.extensions):
                 ignored_files.append(source_file)
                 continue
 
@@ -178,12 +178,12 @@ class CopyArtifactsPlugin(BeetsPlugin):
 
 
         if self.print_ignored and ignored_files:
-            self._log.warning('Ignored files:')
+            self._log.warning(u'Ignored files:')
             for f in ignored_files:
                 self._log.warning('   {0}', os.path.basename(f))
 
     def _copy_artifact(self, source_file, dest_file):
-        self._log.info('Copying artifact: {0}'.format(os.path.basename(dest_file)))
+        self._log.info(u'Copying artifact: {0}'.format(os.path.basename(dest_file.decode('utf8'))))
         beets.util.copy(source_file, dest_file)
 
     def _move_artifact(self, source_file, dest_file):
@@ -191,7 +191,7 @@ class CopyArtifactsPlugin(BeetsPlugin):
             # Sanity check for other plugins moving files
             return
 
-        self._log.info('Moving artifact: {0}'.format(os.path.basename(dest_file)))
+        self._log.info(u'Moving artifact: {0}'.format(os.path.basename(dest_file.decode('utf8'))))
         beets.util.move(source_file, dest_file)
 
         dir_path = os.path.split(source_file)[0]

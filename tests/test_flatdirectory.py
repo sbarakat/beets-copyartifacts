@@ -1,7 +1,7 @@
 import os
 import sys
 
-from helper import CopyArtifactsTestCase
+from tests.helper import CopyArtifactsTestCase
 from beets import config
 
 class CopyArtifactsFromFlatDirectoryTest(CopyArtifactsTestCase):
@@ -21,35 +21,35 @@ class CopyArtifactsFromFlatDirectoryTest(CopyArtifactsTestCase):
 
         self._run_importer()
 
-        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
-        self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
+        self.assert_in_lib_dir(b'Tag Artist', b'Tag Album', b'artifact.file')
+        self.assert_not_in_lib_dir(b'Tag Artist', b'Tag Album', b'artifact.file2')
 
     def test_copy_all_artifacts_by_default(self):
         self._run_importer()
 
-        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
-        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
+        self.assert_in_lib_dir(b'Tag Artist', b'Tag Album', b'artifact.file')
+        self.assert_in_lib_dir(b'Tag Artist', b'Tag Album', b'artifact.file2')
 
     def test_copy_artifacts(self):
         self._run_importer()
 
-        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
-        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
+        self.assert_in_lib_dir(b'Tag Artist', b'Tag Album', b'artifact.file')
+        self.assert_in_lib_dir(b'Tag Artist', b'Tag Album', b'artifact.file2')
 
     def test_ignore_media_files(self):
         self._run_importer()
 
-        self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'track_1.mp3')
+        self.assert_not_in_lib_dir(b'Tag Artist', b'Tag Album', b'track_1.mp3')
 
     def test_move_artifacts(self):
         config['import']['move'] = True
 
         self._run_importer()
 
-        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
-        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
-        self.assert_not_in_import_dir('the_album', 'artifact.file')
-        self.assert_not_in_import_dir('the_album', 'artifact.file2')
+        self.assert_in_lib_dir(b'Tag Artist', b'Tag Album', b'artifact.file')
+        self.assert_in_lib_dir(b'Tag Artist', b'Tag Album', b'artifact.file2')
+        self.assert_not_in_import_dir(b'the_album', b'artifact.file')
+        self.assert_not_in_import_dir(b'the_album', b'artifact.file2')
 
     def test_prune_import_directory_when_emptied(self):
         """
@@ -60,7 +60,7 @@ class CopyArtifactsFromFlatDirectoryTest(CopyArtifactsTestCase):
 
         self._run_importer()
 
-        self.assert_not_in_import_dir('the_album')
+        self.assert_not_in_import_dir(b'the_album')
 
     def test_do_nothing_when_not_copying_or_moving(self):
         """
@@ -72,26 +72,26 @@ class CopyArtifactsFromFlatDirectoryTest(CopyArtifactsTestCase):
 
         self._run_importer()
 
-        self.assert_number_of_files_in_dir(3, self.import_dir, 'the_album')
-        self.assert_in_import_dir('the_album', 'artifact.file')
-        self.assert_in_import_dir('the_album', 'artifact.file2')
+        self.assert_number_of_files_in_dir(3, self.import_dir, b'the_album')
+        self.assert_in_import_dir(b'the_album', b'artifact.file')
+        self.assert_in_import_dir(b'the_album', b'artifact.file2')
 
     def test_rename_when_copying(self):
         config['copyartifacts']['extensions'] = '.file'
-        config['paths']['ext:file'] = unicode('$albumpath/$artist - $album')
+        config['paths']['ext:file'] = str('$albumpath/$artist - $album')
 
         self._run_importer()
 
-        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'Tag Artist - Tag Album.file')
-        self.assert_in_import_dir('the_album', 'artifact.file')
+        self.assert_in_lib_dir(b'Tag Artist', b'Tag Album', b'Tag Artist - Tag Album.file')
+        self.assert_in_import_dir(b'the_album', b'artifact.file')
 
     def test_rename_when_moving(self):
         config['copyartifacts']['extensions'] = '.file'
-        config['paths']['ext:file'] = unicode('$albumpath/$artist - $album')
+        config['paths']['ext:file'] = str('$albumpath/$artist - $album')
         config['import']['move'] = True
 
         self._run_importer()
 
-        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'Tag Artist - Tag Album.file')
-        self.assert_not_in_import_dir('the_album', 'artifact.file')
+        self.assert_in_lib_dir(b'Tag Artist', b'Tag Album', b'Tag Artist - Tag Album.file')
+        self.assert_not_in_import_dir(b'the_album', b'artifact.file')
 
