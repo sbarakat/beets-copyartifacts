@@ -1,3 +1,14 @@
+
+THIS BEETS PLUGIN IS NO LONGER BEING MAINTAINED
+
+I no longer have time to maintain this plugin. Thank you to all those involved for their contributions.
+
+Some alternatives have been described on `issue #31 <https://github.com/sbarakat/beets-copyartifacts/issues/31>`_, notably:
+
+* `beets-copyartifacts3 <https://github.com/adammillerio/beets-copyartifacts>`_ - a fork by Adam Miller which includes Python 3 fixes
+* `beets-extrafiles <https://github.com/Holzhaus/beets-extrafiles>`_ - an entirely new plugin for managing files
+
+
 copyartifacts plugin for beets
 ==============================
 
